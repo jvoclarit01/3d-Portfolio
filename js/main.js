@@ -213,7 +213,7 @@
   // ---------- Discord presence (placeholder; Lanyard-ready) ----------
   // To go live: 1) join the Lanyard Discord (https://discord.gg/lanyard)
   //             2) put your Discord user ID below. Nothing else to change.
-  var DISCORD_USER_ID = ""; // e.g. "123456789012345678"
+  var DISCORD_USER_ID = "615484398392967168"; // e.g. "123456789012345678"
 
   function applyPresence(data) {
     if (!data || !data.success || !data.data) return;

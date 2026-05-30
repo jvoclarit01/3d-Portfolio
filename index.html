@@ -75,17 +75,32 @@
   <!-- ============================ MAIN ============================ -->
   <main id="top">
 
-    <!-- ---------- HERO ---------- -->
-    <section class="hero" id="hero">
-      <p class="hero__eyebrow" data-reveal>Product Designer &amp; Developer</p>
-      <h1 class="hero__title">
-        <span class="hero__line" data-split-chars>Designing &amp; building</span>
-        <span class="hero__line hero__line--accent" data-split-chars>thoughtful products.</span>
-      </h1>
-      <a href="#contact" class="btn btn--lg">
-        <span class="btn__text">Get in touch</span>
-        <span class="btn__hover" aria-hidden="true"></span>
-      </a>
+    <!-- ---------- HERO  (text left · particle right) ---------- -->
+    <section class="stage stage--text-left hero" id="hero">
+      <div class="stage__inner">
+        <div class="stage__col stage__col--text">
+          <div class="stage__content">
+            <div class="hero__eyebrow-wrap">
+              <p class="hero__eyebrow" data-reveal>Product Designer &amp; Developer</p>
+            </div>
+            <div class="hero__title-wrap">
+              <h1 class="hero__title">
+                <span class="hero__line" data-split-chars>Designing &amp; building</span>
+                <span class="hero__line hero__line--accent" data-split-chars>thoughtful products.</span>
+              </h1>
+            </div>
+            <div class="hero__actions">
+              <a href="#contact" class="btn btn--lg">
+                <span class="btn__text">Get in touch</span>
+                <span class="btn__hover" aria-hidden="true"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="stage__col stage__col--media" aria-hidden="true">
+          <div class="stage__particle-zone" data-particle></div>
+        </div>
+      </div>
       <div class="hero__scroll" data-reveal>
         <span>Scroll</span>
         <span class="hero__scroll-line"></span>
@@ -100,20 +115,35 @@
       </h2>
     </section>
 
-    <!-- ---------- ABOUT / MANIFESTO ---------- -->
-    <section class="section feature" id="about">
-      <div class="feature__text">
-        <h2 class="feature__heading" data-split-chars>
-          <span class="d-block">Make things</span>
-          <span class="d-block">with intention</span>
-        </h2>
-        <div class="feature__body" data-reveal>
-          <p>I&rsquo;m a designer and developer who believes the best products feel
-             inevitable &mdash; <em>simple</em> on the surface, considered underneath.</p>
-          <p>From first sketch to shipped interface, I care about the rhythm of
-             type, the weight of motion, and the small moments that make software
-             feel <em>human</em>.</p>
-          <a href="#work" class="link-underline">See selected work</a>
+    <!-- ---------- ABOUT  (text right · particle left) ---------- -->
+    <section class="stage stage--text-right" id="about">
+      <div class="stage__inner">
+        <div class="stage__col stage__col--text">
+          <div class="stage__content">
+            <div class="stage__heading-wrap">
+              <h2 class="feature__heading" data-split-chars>
+                <span class="d-block">Make things</span>
+                <span class="d-block">with intention</span>
+              </h2>
+            </div>
+            <div class="feature__body" data-reveal>
+              <div class="stage__p">
+                <p>I&rsquo;m a designer and developer who believes the best products feel
+                   inevitable &mdash; <em>simple</em> on the surface, considered underneath.</p>
+              </div>
+              <div class="stage__p">
+                <p>From first sketch to shipped interface, I care about the rhythm of
+                   type, the weight of motion, and the small moments that make software
+                   feel <em>human</em>.</p>
+              </div>
+              <div class="stage__actions">
+                <a href="#work" class="link-underline">See selected work</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="stage__col stage__col--media" aria-hidden="true">
+          <div class="stage__particle-zone" data-particle></div>
         </div>
       </div>
     </section>
@@ -188,17 +218,30 @@
     </section>
 
     <!-- ---------- BIG STATEMENT ---------- -->
-    <section class="section feature feature--right" id="philosophy">
-      <div class="feature__text">
-        <h2 class="feature__heading" data-split-chars>
-          <span class="d-block">Build a better</span>
-          <span class="d-block">way to work</span>
-        </h2>
-        <div class="feature__body" data-reveal>
-          <p>My favourite moments at work are when I&rsquo;m in flow &mdash;
-             intellectually stimulated and creating something of value.</p>
-          <p>I want every project I touch to feel that way: integrated with how
-             people <em>think</em>, <em>feel</em>, and <em>work</em>.</p>
+    <section class="stage stage--text-left" id="philosophy">
+      <div class="stage__inner">
+        <div class="stage__col stage__col--text">
+          <div class="stage__content">
+            <div class="stage__heading-wrap">
+              <h2 class="feature__heading" data-split-chars>
+                <span class="d-block">Build a better</span>
+                <span class="d-block">way to work</span>
+              </h2>
+            </div>
+            <div class="feature__body" data-reveal>
+              <div class="stage__p">
+                <p>My favourite moments at work are when I&rsquo;m in flow &mdash;
+                   intellectually stimulated and creating something of value.</p>
+              </div>
+              <div class="stage__p">
+                <p>I want every project I touch to feel that way: integrated with how
+                   people <em>think</em>, <em>feel</em>, and <em>work</em>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="stage__col stage__col--media" aria-hidden="true">
+          <div class="stage__particle-zone" data-particle></div>
         </div>
       </div>
     </section>
