@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>[ Your Name ] — Portfolio</title>
+  <meta name="description" content="Portfolio of [ Your Name ] — Product Designer & Developer crafting thoughtful digital experiences." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+</head>
+<body class="is-loading">
+  <a href="#hero" class="skip-link">Skip to content</a>
+
+  <!-- ============================ LOADER ============================ -->
+  <div class="site-loader" id="loader">
+    <div class="site-loader__inner">
+      <div class="site-loader__spinner">
+        <svg class="site-loader__spinner-svg" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M8 6 H30 a14 14 0 0 1 0 36 H8 Z" fill="none" stroke="url(#lg)" stroke-width="3" />
+          <path d="M19 17 L31 24 L19 31 Z" fill="url(#lg)" />
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#189b81" />
+              <stop offset="45%" stop-color="#8052ff" />
+              <stop offset="100%" stop-color="#ffb829" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div class="site-loader__text">
+        <div class="site-loader__loading-text"><span data-loader-line>Loading</span></div>
+        <div class="site-loader__heading-text"><span class="site-loader__heading-inner" data-loader-line>[ Your Name ]</span></div>
+      </div>
+
+      <div class="site-loader__info">
+        <span class="site-loader__count" id="loaderCount">0</span>
+        <span class="site-loader__ellipsis-wrapper"><span>.</span><span>.</span><span>.</span></span>
+        <span class="site-loader__status">Completed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ WEBGL CANVAS ============================ -->
+  <canvas id="scene" class="scene-canvas" aria-hidden="true"></canvas>
+
+  <!-- ============================ HEADER ============================ -->
+  <header class="header">
+    <div class="header__inner container">
+      <a href="#top" class="brand" aria-label="[ Your Name ] — home">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M5 4 H18 a11 11 0 0 1 0 24 H5 Z" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 11 L20 16 L12 21 Z" fill="currentColor"/></svg>
+        </span>
+        <span class="brand__name">[ Your Name ]</span>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li class="nav__item"><a href="#work" class="nav__link" data-split-chars>Work</a></li>
+          <li class="nav__item"><a href="#about" class="nav__link" data-split-chars>About</a></li>
+          <li class="nav__item"><a href="#experience" class="nav__link" data-split-chars>Experience</a></li>
+          <li class="nav__item"><a href="#contact" class="btn"><span class="btn__text">Get in touch</span><span class="btn__hover" aria-hidden="true"></span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================ MAIN ============================ -->
+  <main id="top">
+
+    <!-- ---------- HERO ---------- -->
+    <section class="hero" id="hero">
+      <p class="hero__eyebrow" data-reveal>Product Designer &amp; Developer</p>
+      <h1 class="hero__title">
+        <span class="hero__line" data-split-chars>Designing &amp; building</span>
+        <span class="hero__line hero__line--accent" data-split-chars>thoughtful products.</span>
+      </h1>
+      <a href="#contact" class="btn btn--lg">
+        <span class="btn__text">Get in touch</span>
+        <span class="btn__hover" aria-hidden="true"></span>
+      </a>
+      <div class="hero__scroll" data-reveal>
+        <span>Scroll</span>
+        <span class="hero__scroll-line"></span>
+      </div>
+    </section>
+
+    <!-- ---------- INTRO STATEMENT ---------- -->
+    <section class="section statement" id="intro">
+      <h2 class="statement__heading" data-split-lines>
+        <span>Selected work, ideas, and the</span>
+        <span>craft behind every detail.</span>
+      </h2>
+    </section>
+
+    <!-- ---------- ABOUT / MANIFESTO ---------- -->
+    <section class="section feature" id="about">
+      <h2 class="feature__heading" data-split-chars>
+        <span class="d-block">Make things</span>
+        <span class="d-block">with intention</span>
+      </h2>
+      <div class="feature__body" data-reveal>
+        <p>I&rsquo;m a designer and developer who believes the best products feel
+           inevitable &mdash; <em>simple</em> on the surface, considered underneath.</p>
+        <p>From first sketch to shipped interface, I care about the rhythm of
+           type, the weight of motion, and the small moments that make software
+           feel <em>human</em>.</p>
+        <a href="#work" class="link-underline">See selected work</a>
+      </div>
+    </section>
+
+    <!-- ---------- THREE-COLUMN MANIFESTO (over particle field) ---------- -->
+    <section class="section manifesto" id="approach">
+      <div class="manifesto__grid">
+        <div class="manifesto__col" data-split-lines>
+          <p><span>This is how most products start. Scattered ideas,</span>
+             <span>half-formed flows, and a hundred unanswered questions.</span></p>
+        </div>
+        <div class="manifesto__col" data-split-lines>
+          <p><span>The work is making sense of that chaos &mdash; turning noise</span>
+             <span>into a clear, confident, and considered experience.</span></p>
+        </div>
+        <div class="manifesto__col" data-split-lines>
+          <p><span>Good design removes friction you never notice. It earns</span>
+             <span>trust quietly, one deliberate decision at a time.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- SELECTED WORK ---------- -->
+    <section class="section work" id="work">
+      <header class="work__intro">
+        <h2 class="work__heading" data-split-chars>
+          <span class="d-block">Selected</span>
+          <span class="d-block">work</span>
+        </h2>
+        <p class="work__lead" data-reveal>A few projects I&rsquo;m proud of. Replace these
+          placeholders with your own case studies.</p>
+      </header>
+
+      <ul class="work__list">
+        <li class="project" data-reveal>
+          <a href="#" class="project__link">
+            <span class="project__index">01</span>
+            <span class="project__title">[ Project One ]</span>
+            <span class="project__meta">Brand &amp; Web &middot; 2025</span>
+            <span class="project__arrow" aria-hidden="true">&#8599;</span>
+          </a>
+          <div class="project__thumb" data-tilt><span>Placeholder image</span></div>
+        </li>
+        <li class="project" data-reveal>
+          <a href="#" class="project__link">
+            <span class="project__index">02</span>
+            <span class="project__title">[ Project Two ]</span>
+            <span class="project__meta">Product Design &middot; 2024</span>
+            <span class="project__arrow" aria-hidden="true">&#8599;</span>
+          </a>
+          <div class="project__thumb" data-tilt><span>Placeholder image</span></div>
+        </li>
+        <li class="project" data-reveal>
+          <a href="#" class="project__link">
+            <span class="project__index">03</span>
+            <span class="project__title">[ Project Three ]</span>
+            <span class="project__meta">Design System &middot; 2024</span>
+            <span class="project__arrow" aria-hidden="true">&#8599;</span>
+          </a>
+          <div class="project__thumb" data-tilt><span>Placeholder image</span></div>
+        </li>
+        <li class="project" data-reveal>
+          <a href="#" class="project__link">
+            <span class="project__index">04</span>
+            <span class="project__title">[ Project Four ]</span>
+            <span class="project__meta">Mobile App &middot; 2023</span>
+            <span class="project__arrow" aria-hidden="true">&#8599;</span>
+          </a>
+          <div class="project__thumb" data-tilt><span>Placeholder image</span></div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ---------- BIG STATEMENT ---------- -->
+    <section class="section feature feature--right" id="philosophy">
+      <h2 class="feature__heading" data-split-chars>
+        <span class="d-block">Build a better</span>
+        <span class="d-block">way to work</span>
+      </h2>
+      <div class="feature__body" data-reveal>
+        <p>My favourite moments at work are when I&rsquo;m in flow &mdash;
+           intellectually stimulated and creating something of value.</p>
+        <p>I want every project I touch to feel that way: integrated with how
+           people <em>think</em>, <em>feel</em>, and <em>work</em>.</p>
+      </div>
+    </section>
+
+    <!-- ---------- EXPERIENCE CAROUSEL ---------- -->
+    <section class="section team" id="experience">
+      <div class="team__head">
+        <h2 class="team__heading" data-split-chars><span class="d-block">Experience</span></h2>
+        <div class="team__controls">
+          <button class="team__btn" id="prevSlide" aria-label="Previous">&#8592;</button>
+          <button class="team__btn" id="nextSlide" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+
+      <div class="team__viewport">
+        <ul class="team__track" id="teamTrack">
+          <li class="team-card">
+            <div class="team-card__avatar"><span>Logo</span></div>
+            <span class="team-card__role">Senior Product Designer</span>
+            <h3 class="team-card__name">[ Company One ]</h3>
+            <p class="team-card__period">2023 — Present</p>
+            <p class="team-card__desc">Leading end-to-end design for the core product, from research to shipped UI.</p>
+          </li>
+          <li class="team-card">
+            <div class="team-card__avatar"><span>Logo</span></div>
+            <span class="team-card__role">Product Designer</span>
+            <h3 class="team-card__name">[ Company Two ]</h3>
+            <p class="team-card__period">2021 — 2023</p>
+            <p class="team-card__desc">Owned the design system and partnered with engineering on a full rebrand.</p>
+          </li>
+          <li class="team-card">
+            <div class="team-card__avatar"><span>Logo</span></div>
+            <span class="team-card__role">UI / UX Designer</span>
+            <h3 class="team-card__name">[ Company Three ]</h3>
+            <p class="team-card__period">2019 — 2021</p>
+            <p class="team-card__desc">Designed marketing sites and product flows for early-stage startups.</p>
+          </li>
+          <li class="team-card">
+            <div class="team-card__avatar"><span>Logo</span></div>
+            <span class="team-card__role">Freelance</span>
+            <h3 class="team-card__name">[ Studio / Clients ]</h3>
+            <p class="team-card__period">2017 — 2019</p>
+            <p class="team-card__desc">Brand identities and websites for a range of independent clients.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ---------- TOOLS / STACK STRIP ---------- -->
+    <section class="section logos" id="stack">
+      <div class="logos__head" data-reveal>
+        <h2 class="logos__heading" data-split-chars><span class="d-block">Tools &amp; stack</span></h2>
+        <p class="logos__lead">The kit I reach for. Swap in whatever you actually use.</p>
+      </div>
+      <ul class="logos__grid">
+        <li data-reveal>Figma</li>
+        <li data-reveal>Framer</li>
+        <li data-reveal>React</li>
+        <li data-reveal>Next.js</li>
+        <li data-reveal>Three.js</li>
+        <li data-reveal>GSAP</li>
+        <li data-reveal>TypeScript</li>
+        <li data-reveal>Tailwind</li>
+      </ul>
+    </section>
+
+    <!-- ---------- FINAL CTA ---------- -->
+    <section class="section cta" id="contact">
+      <h2 class="cta__heading">
+        <span class="cta__line" data-split-chars>Let&rsquo;s build</span>
+        <span class="cta__line" data-split-chars>something good.</span>
+      </h2>
+      <a href="mailto:you@email.com" class="btn btn--lg">
+        <span class="btn__text">you@email.com</span>
+        <span class="btn__hover" aria-hidden="true"></span>
+      </a>
+    </section>
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="footer">
+    <div class="footer__inner container">
+      <div class="footer__copy">
+        <span>&copy; 2026 [ Your Name ].</span>
+        <span>All rights reserved.</span>
+      </div>
+      <ul class="footer__nav">
+        <li><a href="#work" data-split-chars>Work</a></li>
+        <li><a href="#about" data-split-chars>About</a></li>
+        <li><a href="#experience" data-split-chars>Experience</a></li>
+        <li><a href="#contact" data-split-chars>Contact</a></li>
+      </ul>
+      <div class="footer__social">
+        <a href="#" aria-label="LinkedIn">LinkedIn</a>
+        <a href="#" aria-label="Twitter">Twitter</a>
+        <a href="mailto:you@email.com" aria-label="Email">Email</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="js/particles.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

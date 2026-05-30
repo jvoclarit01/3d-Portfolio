@@ -1,0 +1,14 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# tooling
+.playwright-cli/
+node_modules/
+
+# local media (large source assets kept out of the repo)
+*.mp4
+*.webm
+frames/
+dala-frames/
