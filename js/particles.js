@@ -37,10 +37,10 @@ const SCALE = 0.34;                                // uniform cube size
 // one shared orientation for every cube -> uniform, still, but still reads as 3D
 const SHARED_QUAT = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.45, 0.6, 0));
 
-// three-colour gradient mapped vertically across the cloud (green -> blue -> violet)
-const GRAD_A = new THREE.Color(0x10b981);  // green
-const GRAD_B = new THREE.Color(0x3b82f6);  // blue
-const GRAD_C = new THREE.Color(0xa855f7);  // violet
+// three-colour gradient mapped vertically across the cloud (cyan -> violet -> pink)
+const GRAD_A = new THREE.Color(0x00f3ff);  // neon cyan
+const GRAD_B = new THREE.Color(0xa855f7);  // violet
+const GRAD_C = new THREE.Color(0xff007f);  // neon pink/magenta
 const GRAD_H = 5.0;                         // half-height the gradient spans
 const gradTmp = new THREE.Color();
 function gradAt(y) {
