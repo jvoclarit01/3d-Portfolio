@@ -27,9 +27,9 @@
           <path d="M19 17 L31 24 L19 31 Z" fill="url(#lg)" />
           <defs>
             <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#189b81" />
-              <stop offset="45%" stop-color="#8052ff" />
-              <stop offset="100%" stop-color="#ffb829" />
+              <stop offset="0%" stop-color="#3b82f6" />
+              <stop offset="45%" stop-color="#6d5dfc" />
+              <stop offset="100%" stop-color="#a855f7" />
             </linearGradient>
           </defs>
         </svg>
@@ -65,7 +65,7 @@
         <ul class="nav__list">
           <li class="nav__item"><a href="#work" class="nav__link" data-split-chars>Work</a></li>
           <li class="nav__item"><a href="#about" class="nav__link" data-split-chars>About</a></li>
-          <li class="nav__item"><a href="#experience" class="nav__link" data-split-chars>Experience</a></li>
+          <li class="nav__item"><a href="#activity" class="nav__link" data-split-chars>Activity</a></li>
           <li class="nav__item"><a href="#contact" class="btn"><span class="btn__text">Get in touch</span><span class="btn__hover" aria-hidden="true"></span></a></li>
         </ul>
       </nav>
@@ -102,17 +102,19 @@
 
     <!-- ---------- ABOUT / MANIFESTO ---------- -->
     <section class="section feature" id="about">
-      <h2 class="feature__heading" data-split-chars>
-        <span class="d-block">Make things</span>
-        <span class="d-block">with intention</span>
-      </h2>
-      <div class="feature__body" data-reveal>
-        <p>I&rsquo;m a designer and developer who believes the best products feel
-           inevitable &mdash; <em>simple</em> on the surface, considered underneath.</p>
-        <p>From first sketch to shipped interface, I care about the rhythm of
-           type, the weight of motion, and the small moments that make software
-           feel <em>human</em>.</p>
-        <a href="#work" class="link-underline">See selected work</a>
+      <div class="feature__text">
+        <h2 class="feature__heading" data-split-chars>
+          <span class="d-block">Make things</span>
+          <span class="d-block">with intention</span>
+        </h2>
+        <div class="feature__body" data-reveal>
+          <p>I&rsquo;m a designer and developer who believes the best products feel
+             inevitable &mdash; <em>simple</em> on the surface, considered underneath.</p>
+          <p>From first sketch to shipped interface, I care about the rhythm of
+             type, the weight of motion, and the small moments that make software
+             feel <em>human</em>.</p>
+          <a href="#work" class="link-underline">See selected work</a>
+        </div>
       </div>
     </section>
 
@@ -187,59 +189,78 @@
 
     <!-- ---------- BIG STATEMENT ---------- -->
     <section class="section feature feature--right" id="philosophy">
-      <h2 class="feature__heading" data-split-chars>
-        <span class="d-block">Build a better</span>
-        <span class="d-block">way to work</span>
-      </h2>
-      <div class="feature__body" data-reveal>
-        <p>My favourite moments at work are when I&rsquo;m in flow &mdash;
-           intellectually stimulated and creating something of value.</p>
-        <p>I want every project I touch to feel that way: integrated with how
-           people <em>think</em>, <em>feel</em>, and <em>work</em>.</p>
+      <div class="feature__text">
+        <h2 class="feature__heading" data-split-chars>
+          <span class="d-block">Build a better</span>
+          <span class="d-block">way to work</span>
+        </h2>
+        <div class="feature__body" data-reveal>
+          <p>My favourite moments at work are when I&rsquo;m in flow &mdash;
+             intellectually stimulated and creating something of value.</p>
+          <p>I want every project I touch to feel that way: integrated with how
+             people <em>think</em>, <em>feel</em>, and <em>work</em>.</p>
+        </div>
       </div>
     </section>
 
-    <!-- ---------- EXPERIENCE CAROUSEL ---------- -->
-    <section class="section team" id="experience">
-      <div class="team__head">
-        <h2 class="team__heading" data-split-chars><span class="d-block">Experience</span></h2>
-        <div class="team__controls">
-          <button class="team__btn" id="prevSlide" aria-label="Previous">&#8592;</button>
-          <button class="team__btn" id="nextSlide" aria-label="Next">&#8594;</button>
-        </div>
+    <!-- ---------- LIVE ACTIVITY (Discord presence + GitHub contributions) ---------- -->
+    <section class="section activity" id="activity">
+      <div class="activity__head">
+        <h2 class="activity__heading" data-split-chars><span class="d-block">Currently</span></h2>
+        <p class="activity__lead" data-reveal>What I&rsquo;m up to right now &mdash; live from Discord and GitHub.
+          <span class="activity__note">(Placeholder data for now.)</span></p>
       </div>
 
-      <div class="team__viewport">
-        <ul class="team__track" id="teamTrack">
-          <li class="team-card">
-            <div class="team-card__avatar"><span>Logo</span></div>
-            <span class="team-card__role">Senior Product Designer</span>
-            <h3 class="team-card__name">[ Company One ]</h3>
-            <p class="team-card__period">2023 — Present</p>
-            <p class="team-card__desc">Leading end-to-end design for the core product, from research to shipped UI.</p>
-          </li>
-          <li class="team-card">
-            <div class="team-card__avatar"><span>Logo</span></div>
-            <span class="team-card__role">Product Designer</span>
-            <h3 class="team-card__name">[ Company Two ]</h3>
-            <p class="team-card__period">2021 — 2023</p>
-            <p class="team-card__desc">Owned the design system and partnered with engineering on a full rebrand.</p>
-          </li>
-          <li class="team-card">
-            <div class="team-card__avatar"><span>Logo</span></div>
-            <span class="team-card__role">UI / UX Designer</span>
-            <h3 class="team-card__name">[ Company Three ]</h3>
-            <p class="team-card__period">2019 — 2021</p>
-            <p class="team-card__desc">Designed marketing sites and product flows for early-stage startups.</p>
-          </li>
-          <li class="team-card">
-            <div class="team-card__avatar"><span>Logo</span></div>
-            <span class="team-card__role">Freelance</span>
-            <h3 class="team-card__name">[ Studio / Clients ]</h3>
-            <p class="team-card__period">2017 — 2019</p>
-            <p class="team-card__desc">Brand identities and websites for a range of independent clients.</p>
-          </li>
-        </ul>
+      <div class="activity__grid">
+
+        <!-- Discord presence card -->
+        <article class="presence" data-reveal>
+          <header class="presence__top">
+            <div class="presence__avatar">
+              <span class="presence__avatar-ph" aria-hidden="true">DC</span>
+              <span class="presence__dot presence__dot--online" id="discordDot"></span>
+            </div>
+            <div class="presence__id">
+              <h3 class="presence__name" id="discordName">[ your_handle ]</h3>
+              <p class="presence__state" id="discordState" aria-live="polite">Online</p>
+            </div>
+            <svg class="presence__brand" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 0 0-4.8851-1.5152.0741.0741 0 0 0-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 0 0-.0785-.037 19.7363 19.7363 0 0 0-4.8852 1.515.0699.0699 0 0 0-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 0 0 .0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 0 0 .0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 0 0-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 0 1-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 0 1 .0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 0 1 .0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 0 1-.0066.1276 12.2986 12.2986 0 0 1-1.873.8914.0766.0766 0 0 0-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 0 0 .0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 0 0 .0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 0 0-.0312-.0286ZM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189Zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
+            </svg>
+          </header>
+
+          <div class="presence__activity" id="discordActivity">
+            <div class="presence__art" aria-hidden="true"><span>&#9658;</span></div>
+            <div class="presence__act-body">
+              <span class="presence__act-label" id="discordActLabel">Playing a game</span>
+              <span class="presence__act-title" id="discordActTitle">[ Activity name ]</span>
+              <span class="presence__act-detail" id="discordActDetail">[ What you&rsquo;re doing ]</span>
+              <span class="presence__act-state" id="discordActState">[ Status detail ]</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- GitHub contributions card -->
+        <article class="contrib" data-reveal>
+          <header class="contrib__top">
+            <div class="contrib__id">
+              <h3 class="contrib__name" id="ghName">[ your-github ]</h3>
+              <p class="contrib__sub"><span id="ghCount">0</span> contributions in the last year</p>
+            </div>
+            <svg class="contrib__brand" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+            </svg>
+          </header>
+
+          <div class="contrib__graph" id="contribGraph" role="img" aria-label="GitHub contribution graph (placeholder data)"></div>
+
+          <footer class="contrib__legend">
+            <span>Less</span>
+            <span class="contrib__legend-cells" id="contribLegend" aria-hidden="true"></span>
+            <span>More</span>
+          </footer>
+        </article>
+
       </div>
     </section>
 
@@ -284,7 +305,7 @@
       <ul class="footer__nav">
         <li><a href="#work" data-split-chars>Work</a></li>
         <li><a href="#about" data-split-chars>About</a></li>
-        <li><a href="#experience" data-split-chars>Experience</a></li>
+        <li><a href="#activity" data-split-chars>Activity</a></li>
         <li><a href="#contact" data-split-chars>Contact</a></li>
       </ul>
       <div class="footer__social">

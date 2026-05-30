@@ -29,14 +29,26 @@
       var text = line.textContent;
       line.textContent = "";
       var idx = 0;
-      for (var i = 0; i < text.length; i++) {
-        var node = wrapChar(text[i]);
-        if (node.nodeType === 1) {
-          node.firstChild.style.transitionDelay = (idx * 0.022) + "s";
+      // split into words + whitespace so lines only break between words
+      var tokens = text.split(/(\s+)/);
+      tokens.forEach(function (tok) {
+        if (tok === "") return;
+        if (/^\s+$/.test(tok)) { line.appendChild(document.createTextNode(tok)); return; }
+        var word = document.createElement("span");
+        word.className = "crword";
+        for (var i = 0; i < tok.length; i++) {
+          var outer = document.createElement("span");
+          outer.className = "cr";
+          var inner = document.createElement("span");
+          inner.className = "cr__inner";
+          inner.textContent = tok[i];
+          inner.style.transitionDelay = (idx * 0.022) + "s";
           idx++;
+          outer.appendChild(inner);
+          word.appendChild(outer);
         }
-        line.appendChild(node);
-      }
+        line.appendChild(word);
+      });
     });
   }
 
@@ -143,33 +155,96 @@
     requestAnimationFrame(tick);
   }
 
-  // ---------- experience carousel ----------
-  function initCarousel() {
-    var track = document.getElementById("teamTrack");
-    var prev = document.getElementById("prevSlide");
-    var next = document.getElementById("nextSlide");
-    if (!track || !prev || !next) return;
-    var index = 0;
+  // ---------- count-up helper ----------
+  function animateCount(el, to) {
+    if (reduceMotion) { el.textContent = to.toLocaleString(); return; }
+    var start = performance.now(), dur = 1200;
+    function step(now) {
+      var p = Math.min((now - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(eased * to).toLocaleString();
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
 
-    function maxIndex() {
-      var cards = track.children;
-      if (!cards.length) return 0;
-      var cardW = cards[0].getBoundingClientRect().width + 24; // gap
-      var visible = Math.max(1, Math.floor(track.parentNode.getBoundingClientRect().width / cardW));
-      return Math.max(0, cards.length - visible);
+  // ---------- GitHub contribution graph (placeholder) ----------
+  function initContrib() {
+    var graph = document.getElementById("contribGraph");
+    var legend = document.getElementById("contribLegend");
+    var countEl = document.getElementById("ghCount");
+    if (!graph) return;
+
+    var WEEKS = 52, total = 0;
+    var frag = document.createDocumentFragment();
+    for (var w = 0; w < WEEKS; w++) {
+      for (var d = 0; d < 7; d++) {
+        var r = Math.random();
+        var level = r < 0.5 ? 0 : r < 0.72 ? 1 : r < 0.88 ? 2 : r < 0.96 ? 3 : 4;
+        var cell = document.createElement("span");
+        cell.className = "contrib__cell";
+        cell.setAttribute("data-level", level);
+        total += level * 3; // rough placeholder contribution tally
+        frag.appendChild(cell);
+      }
     }
-    function update() {
-      var cardW = track.children[0].getBoundingClientRect().width + 24;
-      track.style.transform = "translateX(" + (-index * cardW) + "px)";
-      prev.disabled = index <= 0;
-      next.disabled = index >= maxIndex();
-      prev.style.opacity = prev.disabled ? 0.4 : 1;
-      next.style.opacity = next.disabled ? 0.4 : 1;
+    graph.appendChild(frag);
+
+    if (legend) {
+      for (var l = 0; l <= 4; l++) {
+        var c = document.createElement("span");
+        c.className = "contrib__cell";
+        c.setAttribute("data-level", l);
+        legend.appendChild(c);
+      }
     }
-    prev.addEventListener("click", function () { index = Math.max(0, index - 1); update(); });
-    next.addEventListener("click", function () { index = Math.min(maxIndex(), index + 1); update(); });
-    window.addEventListener("resize", function () { index = Math.min(index, maxIndex()); update(); });
-    update();
+    if (countEl) {
+      if (reduceMotion || !("IntersectionObserver" in window)) {
+        animateCount(countEl, total);
+      } else {
+        var io = new IntersectionObserver(function (e) {
+          if (e[0].isIntersecting) { animateCount(countEl, total); io.disconnect(); }
+        }, { threshold: 0.4 });
+        io.observe(graph);
+      }
+    }
+  }
+
+  // ---------- Discord presence (placeholder; Lanyard-ready) ----------
+  // To go live: 1) join the Lanyard Discord (https://discord.gg/lanyard)
+  //             2) put your Discord user ID below. Nothing else to change.
+  var DISCORD_USER_ID = ""; // e.g. "123456789012345678"
+
+  function applyPresence(data) {
+    if (!data || !data.success || !data.data) return;
+    var d = data.data;
+    var status = d.discord_status || "offline";
+    var dot = document.getElementById("discordDot");
+    var nameEl = document.getElementById("discordName");
+    var stateEl = document.getElementById("discordState");
+    if (dot) dot.className = "presence__dot presence__dot--" + status;
+    if (nameEl && d.discord_user) nameEl.textContent = d.discord_user.global_name || d.discord_user.username;
+    var label = { online: "Online", idle: "Idle", dnd: "Do Not Disturb", offline: "Offline" }[status] || "Offline";
+    if (stateEl) stateEl.textContent = label;
+
+    var act = (d.activities || []).filter(function (a) { return a.type !== 4; })[0]; // skip custom-status
+    var block = document.getElementById("discordActivity");
+    if (!act) { if (block) block.style.display = "none"; return; }
+    if (block) block.style.display = "";
+    var t = { 0: "Playing", 1: "Streaming", 2: "Listening to", 3: "Watching" }[act.type] || "Doing";
+    set("discordActLabel", t);
+    set("discordActTitle", act.name || "");
+    set("discordActDetail", act.details || "");
+    set("discordActState", act.state || "");
+  }
+  function set(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; }
+
+  function initPresence() {
+    if (!DISCORD_USER_ID) return; // keep placeholder markup until an ID is set
+    fetch("https://api.lanyard.rest/v1/users/" + DISCORD_USER_ID)
+      .then(function (r) { return r.json(); })
+      .then(applyPresence)
+      .catch(function () { /* stay on placeholder */ });
   }
 
   // ---------- project thumb tilt ----------
@@ -189,7 +264,8 @@
   // ---------- boot ----------
   function init() {
     buildSplits();
-    initCarousel();
+    initContrib();
+    initPresence();
     initTilt();
     runLoader(function () {
       revealHero();
