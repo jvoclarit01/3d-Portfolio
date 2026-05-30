@@ -118,13 +118,34 @@
           io.unobserve(e.target);
         }
       });
-    }, { threshold: 0.18, rootMargin: "0px 0px -8% 0px" });
+    }, { threshold: 0.04, rootMargin: "0px 0px 50px 0px" });
     targets.forEach(function (t) { io.observe(t); });
+
+    // Anchor-click instant reveal fallback (fixes scroll limits at bottom/footer sections)
+    function forceReveal(hash) {
+      if (!hash) return;
+      try {
+        var sec = document.querySelector(hash);
+        if (sec) {
+          sec.querySelectorAll("[data-reveal], [data-split-lines], [data-split-chars]:not(a)").forEach(function (el) {
+            el.classList.add("is-in");
+          });
+        }
+      } catch (err) { /* ignore invalid selector hashes */ }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener("click", function () {
+        forceReveal(a.getAttribute("href"));
+      });
+    });
+    if (window.location.hash) {
+      forceReveal(window.location.hash);
+    }
   }
 
   // ---------- hero reveal (after loader lifts) ----------
   function revealHero() {
-    document.querySelectorAll("#hero [data-split-chars], #hero [data-reveal]")
+    document.querySelectorAll("#home [data-split-chars], #home [data-reveal]")
       .forEach(function (el) { el.classList.add("is-in"); });
   }
 
@@ -261,12 +282,189 @@
     });
   }
 
+  // ---------- scroll jacking projects showcase ----------
+  function initProjectsScroll() {
+    var container = document.getElementById("projects");
+    if (!container) return;
+    
+    var cards = container.querySelectorAll(".project-card");
+    var visuals = container.querySelectorAll(".project-visual");
+    
+    function handleScroll() {
+      var rect = container.getBoundingClientRect();
+      var totalHeight = rect.height - window.innerHeight;
+      if (totalHeight <= 0) return;
+      
+      var progress = -rect.top / totalHeight;
+      progress = Math.max(0, Math.min(1, progress));
+      
+      if (window.waveScrollOffset !== undefined) {
+        window.waveScrollOffset = progress * Math.PI * 4;
+        
+        var currentTop = rect.top;
+        var lastTop = handleScroll.lastTop !== undefined ? handleScroll.lastTop : currentTop;
+        var scrollSpeed = Math.abs(currentTop - lastTop);
+        window.waveIntensity = 1.0 + Math.min(scrollSpeed * 0.05, 0.8);
+      }
+      handleScroll.lastTop = rect.top;
+      
+      var count = cards.length;
+      var activeIdx = Math.floor(progress * count);
+      if (activeIdx >= count) activeIdx = count - 1;
+      
+      cards.forEach(function (card, idx) {
+        if (idx === activeIdx) card.classList.add("active");
+        else card.classList.remove("active");
+      });
+      
+      visuals.forEach(function (visual, idx) {
+        if (idx === activeIdx) visual.classList.add("active");
+        else visual.classList.remove("active");
+      });
+    }
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+  }
+
+  // ---------- Hero Profile Picture Fade ----------
+  function initProfileFade() {
+    var heroPic = document.querySelector(".hero-profile-pic");
+    if (!heroPic) return;
+    
+    function handleScroll() {
+      var scrollY = window.scrollY;
+      var fadeHeight = window.innerHeight * 0.72;
+      var opacity = 1 - Math.min(1, scrollY / fadeHeight);
+      heroPic.style.opacity = opacity;
+      
+      var scale = 1 - (scrollY / fadeHeight) * 0.18;
+      var scaleClamp = Math.max(0.7, scale);
+      heroPic.style.setProperty('--profile-scale', scaleClamp);
+      
+      if (opacity <= 0.01) {
+        heroPic.style.visibility = "hidden";
+        heroPic.style.pointerEvents = "none";
+      } else {
+        heroPic.style.visibility = "visible";
+        heroPic.style.pointerEvents = "auto";
+      }
+    }
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+  }
+
+  // ---------- contact form ----------
+  function initContactForm() {
+    var form = document.getElementById("contactForm");
+    if (!form) return;
+    
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      
+      var nameVal = (document.getElementById("formName") ? document.getElementById("formName").value.trim() : "");
+      var emailVal = (document.getElementById("formEmail") ? document.getElementById("formEmail").value.trim() : "");
+      var messageVal = (document.getElementById("formMessage") ? document.getElementById("formMessage").value.trim() : "");
+      
+      if (!nameVal || !emailVal || !messageVal) {
+        alert("Please fill in all fields.");
+        return;
+      }
+      
+      var btn = form.querySelector(".btn-submit");
+      var btnText = btn ? btn.querySelector(".btn__text") : null;
+      if (!btn || !btnText) return;
+      
+      var originalText = btnText.textContent;
+      btnText.textContent = "Sending...";
+      btn.style.pointerEvents = "none";
+      btn.style.opacity = "0.8";
+      
+      setTimeout(function () {
+        btnText.textContent = "Message Sent!";
+        btn.style.background = "#10b981";
+        form.reset();
+        
+        setTimeout(function () {
+          btnText.textContent = originalText;
+          btn.style.pointerEvents = "";
+          btn.style.opacity = "";
+          btn.style.background = "";
+        }, 3000);
+      }, 1500);
+    });
+  }
+
+  // ---------- scroll progress bar ----------
+  function initScrollProgress() {
+    var bar = document.querySelector(".scroll-progress");
+    if (!bar) return;
+    var ticking = false;
+    function update() {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = "scaleX(" + (max > 0 ? h.scrollTop / max : 0) + ")";
+      ticking = false;
+    }
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
+
+  // ---------- scroll-spy: highlight active section link ----------
+  function initScrollSpy() {
+    if (!("IntersectionObserver" in window)) return;
+    var links = {};
+    document.querySelectorAll(".nav__list a").forEach(function (a) {
+      var id = (a.getAttribute("href") || "").slice(1);
+      if (id) links[id] = a;
+    });
+    var sections = Object.keys(links)
+      .map(function (id) { return document.getElementById(id); })
+      .filter(Boolean);
+    if (!sections.length) return;
+    function setCurrent(linkId) {
+      Object.keys(links).forEach(function (k) { 
+        links[k].classList.toggle("is-current", k === linkId); 
+      });
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) setCurrent(e.target.id);
+      });
+    }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
+    sections.forEach(function (s) { io.observe(s); });
+  }
+
+  // ---------- hero role rotator ----------
+  function initRoleRotate() {
+    var el = document.getElementById("roleRotate");
+    if (!el) return;
+    var roles = (el.getAttribute("data-roles") || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+    if (roles.length < 2 || reduceMotion) return;
+    el.style.transition = "opacity .26s ease, transform .26s ease";
+    var i = 0;
+    setInterval(function () {
+      i = (i + 1) % roles.length;
+      el.style.opacity = "0"; el.style.transform = "translateY(6px)";
+      setTimeout(function () { el.textContent = roles[i]; el.style.opacity = "1"; el.style.transform = "none"; }, 260);
+    }, 2200);
+  }
+
   // ---------- boot ----------
   function init() {
     buildSplits();
     initContrib();
     initPresence();
     initTilt();
+    initProjectsScroll();
+    initProfileFade();
+    initContactForm();
+    initScrollProgress();
+    initScrollSpy();
+    initRoleRotate();
     runLoader(function () {
       revealHero();
       startReveals();

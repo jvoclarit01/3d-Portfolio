@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>[ Your Name ] — Portfolio</title>
-  <meta name="description" content="Portfolio of [ Your Name ] — Product Designer & Developer crafting thoughtful digital experiences." />
+  <title>Jan Vincent Oclarit — Creative Engineer</title>
+  <meta name="description" content="Portfolio of Jan Vincent Oclarit — Creative Engineer & 3D Web Developer building tactile digital experiences." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 
   <script type="importmap">
@@ -16,7 +16,10 @@
   </script>
 </head>
 <body class="is-loading">
-  <a href="#hero" class="skip-link">Skip to content</a>
+  <a href="#home" class="skip-link">Skip to content</a>
+
+  <!-- scroll progress -->
+  <div class="scroll-progress" aria-hidden="true"></div>
 
   <!-- ============================ LOADER ============================ -->
   <div class="site-loader" id="loader">
@@ -36,8 +39,8 @@
       </div>
 
       <div class="site-loader__text">
-        <div class="site-loader__loading-text"><span data-loader-line>Loading</span></div>
-        <div class="site-loader__heading-text"><span class="site-loader__heading-inner" data-loader-line>[ Your Name ]</span></div>
+        <div class="site-loader__loading-text"><span data-loader-line>Loading...</span></div>
+        <div class="site-loader__heading-text"><span class="site-loader__heading-inner" data-loader-line>Jan Vincent Oclarit</span></div>
       </div>
 
       <div class="site-loader__info">
@@ -54,19 +57,20 @@
   <!-- ============================ HEADER ============================ -->
   <header class="header">
     <div class="header__inner container">
-      <a href="#top" class="brand" aria-label="[ Your Name ] — home">
+      <a href="#home" class="brand" aria-label="Jan Vincent Oclarit — home">
         <span class="brand__mark" aria-hidden="true">
           <svg viewBox="0 0 32 32"><path d="M5 4 H18 a11 11 0 0 1 0 24 H5 Z" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 11 L20 16 L12 21 Z" fill="currentColor"/></svg>
         </span>
-        <span class="brand__name">[ Your Name ]</span>
+        <span class="brand__name">JV</span>
       </a>
 
       <nav class="nav" aria-label="Primary">
         <ul class="nav__list">
-          <li class="nav__item"><a href="#work" class="nav__link" data-split-chars>Work</a></li>
+          <li class="nav__item"><a href="#home" class="nav__link" data-split-chars>Home</a></li>
           <li class="nav__item"><a href="#about" class="nav__link" data-split-chars>About</a></li>
-          <li class="nav__item"><a href="#activity" class="nav__link" data-split-chars>Activity</a></li>
-          <li class="nav__item"><a href="#contact" class="btn"><span class="btn__text">Get in touch</span><span class="btn__hover" aria-hidden="true"></span></a></li>
+          <li class="nav__item"><a href="#projects" class="nav__link" data-split-chars>Projects</a></li>
+          <li class="nav__item"><a href="#connect" class="nav__link" data-split-chars>Connect</a></li>
+          <li class="nav__item"><a href="#contact" class="btn"><span class="btn__text">Contact</span><span class="btn__hover" aria-hidden="true"></span></a></li>
         </ul>
       </nav>
     </div>
@@ -75,30 +79,42 @@
   <!-- ============================ MAIN ============================ -->
   <main id="top">
 
-    <!-- ---------- HERO  (text left · particle right) ---------- -->
-    <section class="stage stage--text-left hero" id="hero">
+    <!-- ---------- HOME / HERO ---------- -->
+    <section class="stage stage--text-left hero" id="home">
       <div class="stage__inner">
         <div class="stage__col stage__col--text">
           <div class="stage__content">
-            <div class="hero__eyebrow-wrap">
-              <p class="hero__eyebrow" data-reveal>Product Designer &amp; Developer</p>
+            <div class="hero2__eyebrow-wrap">
+              <p class="hero2__eyebrow" data-reveal>Welcome to my portfolio</p>
             </div>
-            <div class="hero__title-wrap">
-              <h1 class="hero__title">
-                <span class="hero__line" data-split-chars>Designing &amp; building</span>
-                <span class="hero__line hero__line--accent" data-split-chars>thoughtful products.</span>
+            <div class="hero2__title-wrap">
+              <h1 class="hero2__title">
+                <span class="d-block" data-split-chars>Hello, I&rsquo;m</span>
+                <span class="d-block hero2__name" data-split-chars>Jan Vincent Oclarit</span>
               </h1>
             </div>
-            <div class="hero__actions">
-              <a href="#contact" class="btn btn--lg">
-                <span class="btn__text">Get in touch</span>
+            <p class="hero2__role" data-reveal>I am a <span class="hero2__role-rotate" id="roleRotate" data-roles="Developer, Designer, Problem Solver, Creative">Developer</span></p>
+            <p class="hero2__blurb" data-reveal>A driven builder with a curious mind for the ever-evolving world of technology and design. I blend logical problem-solving with creative expression.</p>
+            <div class="hero2__actions" data-reveal>
+              <a href="#about" class="btn btn--lg">
+                <span class="btn__text">Read More</span>
                 <span class="btn__hover" aria-hidden="true"></span>
               </a>
+              <div class="hero2__socials">
+                <a href="https://github.com/jvoclarit01" target="_blank" rel="noopener noreferrer" class="icon-btn" aria-label="GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.3-1.8-1.3-1.8-1.1-.7 0-.7 0-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2 0-.3-.5-1.5.2-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg></a>
+                <a href="#" class="icon-btn" aria-label="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.56v-5.57c0-1.33 0-3.04-1.85-3.04s-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05a3.75 3.75 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14M7.12 20.45H3.56V9h3.56zM22.23 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.73V1.73C24 .77 23.21 0 22.23 0"/></svg></a>
+                <a href="mailto:janvincentoclarit01@gmail.com" class="icon-btn" aria-label="Email"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2 4h20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1m10 7L3.5 6h17zM3 18h18V8.3l-9 6-9-6z"/></svg></a>
+              </div>
             </div>
           </div>
         </div>
         <div class="stage__col stage__col--media" aria-hidden="true">
-          <div class="stage__particle-zone" data-particle></div>
+          <div class="stage__particle-zone" data-particle>
+            <!-- Profile picture centered in the ring -->
+            <div class="hero-profile-pic">
+              <img src="images/profile.png" alt="Jan Vincent Oclarit" />
+            </div>
+          </div>
         </div>
       </div>
       <div class="hero__scroll" data-reveal>
@@ -107,37 +123,39 @@
       </div>
     </section>
 
-    <!-- ---------- INTRO STATEMENT ---------- -->
-    <section class="section statement" id="intro">
-      <h2 class="statement__heading" data-split-lines>
-        <span>Selected work, ideas, and the</span>
-        <span>craft behind every detail.</span>
-      </h2>
-    </section>
-
-    <!-- ---------- ABOUT  (text right · particle left) ---------- -->
+    <!-- ---------- ABOUT ---------- -->
     <section class="stage stage--text-right" id="about">
       <div class="stage__inner">
         <div class="stage__col stage__col--text">
           <div class="stage__content">
             <div class="stage__heading-wrap">
               <h2 class="feature__heading" data-split-chars>
-                <span class="d-block">Make things</span>
-                <span class="d-block">with intention</span>
+                <span class="d-block">Building with</span>
+                <span class="d-block">craft and code</span>
               </h2>
             </div>
             <div class="feature__body" data-reveal>
               <div class="stage__p">
-                <p>I&rsquo;m a designer and developer who believes the best products feel
-                   inevitable &mdash; <em>simple</em> on the surface, considered underneath.</p>
+                <p>I am a creative developer who bridges the gap between design systems and immersive frontend technology. I make digital interfaces feel responsive, tactile, and human.</p>
               </div>
               <div class="stage__p">
-                <p>From first sketch to shipped interface, I care about the rhythm of
-                   type, the weight of motion, and the small moments that make software
-                   feel <em>human</em>.</p>
+                <p>I focus on GPU-accelerated graphics, fine-tuned typography, and rich physical motion. My work is built on robust engineering and strict design principles.</p>
               </div>
+              
+              <div class="about-skills">
+                <h3 class="about-skills__title">Skills &amp; Technologies</h3>
+                <div class="about-skills__grid">
+                  <div class="skill-tag"><span>Three.js / WebGL</span></div>
+                  <div class="skill-tag"><span>JavaScript / TS</span></div>
+                  <div class="skill-tag"><span>React / Next.js</span></div>
+                  <div class="skill-tag"><span>GSAP &amp; CSS Motion</span></div>
+                  <div class="skill-tag"><span>HTML5 / CSS3</span></div>
+                  <div class="skill-tag"><span>UI/UX &amp; Figma</span></div>
+                </div>
+              </div>
+              
               <div class="stage__actions">
-                <a href="#work" class="link-underline">See selected work</a>
+                <a href="#projects" class="link-underline">View active projects</a>
               </div>
             </div>
           </div>
@@ -148,193 +166,248 @@
       </div>
     </section>
 
-    <!-- ---------- THREE-COLUMN MANIFESTO (over particle field) ---------- -->
-    <section class="section manifesto" id="approach">
-      <div class="manifesto__grid">
-        <div class="manifesto__col" data-split-lines>
-          <p><span>This is how most products start. Scattered ideas,</span>
-             <span>half-formed flows, and a hundred unanswered questions.</span></p>
-        </div>
-        <div class="manifesto__col" data-split-lines>
-          <p><span>The work is making sense of that chaos &mdash; turning noise</span>
-             <span>into a clear, confident, and considered experience.</span></p>
-        </div>
-        <div class="manifesto__col" data-split-lines>
-          <p><span>Good design removes friction you never notice. It earns</span>
-             <span>trust quietly, one deliberate decision at a time.</span></p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ---------- SELECTED WORK ---------- -->
-    <section class="section work" id="work">
-      <header class="work__intro">
-        <h2 class="work__heading" data-split-chars>
-          <span class="d-block">Selected</span>
-          <span class="d-block">work</span>
-        </h2>
-        <p class="work__lead" data-reveal>A few projects I&rsquo;m proud of. Replace these
-          placeholders with your own case studies.</p>
-      </header>
-
-      <ul class="work__list">
-        <li class="project" data-reveal>
-          <a href="#" class="project__link">
-            <span class="project__index">01</span>
-            <span class="project__title">[ Project One ]</span>
-            <span class="project__meta">Brand &amp; Web &middot; 2025</span>
-            <span class="project__arrow" aria-hidden="true">&#8599;</span>
-          </a>
-          <div class="project__thumb" data-tilt><span>Placeholder image</span></div>
-        </li>
-        <li class="project" data-reveal>
-          <a href="#" class="project__link">
-            <span class="project__index">02</span>
-            <span class="project__title">[ Project Two ]</span>
-            <span class="project__meta">Product Design &middot; 2024</span>
-            <span class="project__arrow" aria-hidden="true">&#8599;</span>
-          </a>
-          <div class="project__thumb" data-tilt><span>Placeholder image</span></div>
-        </li>
-        <li class="project" data-reveal>
-          <a href="#" class="project__link">
-            <span class="project__index">03</span>
-            <span class="project__title">[ Project Three ]</span>
-            <span class="project__meta">Design System &middot; 2024</span>
-            <span class="project__arrow" aria-hidden="true">&#8599;</span>
-          </a>
-          <div class="project__thumb" data-tilt><span>Placeholder image</span></div>
-        </li>
-        <li class="project" data-reveal>
-          <a href="#" class="project__link">
-            <span class="project__index">04</span>
-            <span class="project__title">[ Project Four ]</span>
-            <span class="project__meta">Mobile App &middot; 2023</span>
-            <span class="project__arrow" aria-hidden="true">&#8599;</span>
-          </a>
-          <div class="project__thumb" data-tilt><span>Placeholder image</span></div>
-        </li>
-      </ul>
-    </section>
-
-    <!-- ---------- BIG STATEMENT ---------- -->
-    <section class="stage stage--text-left" id="philosophy">
-      <div class="stage__inner">
-        <div class="stage__col stage__col--text">
-          <div class="stage__content">
-            <div class="stage__heading-wrap">
-              <h2 class="feature__heading" data-split-chars>
-                <span class="d-block">Build a better</span>
-                <span class="d-block">way to work</span>
-              </h2>
+    <!-- ---------- PROJECTS SHOWCASE (SCROLL-JACKED) ---------- -->
+    <section class="projects-pin-container" id="projects">
+      <div class="projects-sticky">
+        <div class="projects-inner container">
+          
+          <div class="projects-content-side">
+            <div class="projects-header" data-reveal>
+              <span class="projects-eyebrow">Interactive Showcase</span>
+              <h2 class="projects-main-title">Selected Projects</h2>
             </div>
-            <div class="feature__body" data-reveal>
-              <div class="stage__p">
-                <p>My favourite moments at work are when I&rsquo;m in flow &mdash;
-                   intellectually stimulated and creating something of value.</p>
+            
+            <div class="projects-carousel">
+              <!-- Project 1 -->
+              <article class="project-card active" data-index="0">
+                <span class="project-number">01 / 04</span>
+                <h3 class="project-name">Odyssey 3D Canvas</h3>
+                <p class="project-description">An interactive 3D solar system rendering engine with fluid particle simulations and real-time gravity physics.</p>
+                <div class="project-tags">
+                  <span class="tag">Three.js</span>
+                  <span class="tag">WebGL</span>
+                  <span class="tag">GLSL</span>
+                  <span class="tag">GSAP</span>
+                </div>
+              </article>
+              
+              <!-- Project 2 -->
+              <article class="project-card" data-index="1">
+                <span class="project-number">02 / 04</span>
+                <h3 class="project-name">Portal OS</h3>
+                <p class="project-description">A futuristic web desktop environment featuring custom window managers, terminal emulation, and physics widgets.</p>
+                <div class="project-tags">
+                  <span class="tag">React</span>
+                  <span class="tag">Next.js</span>
+                  <span class="tag">Node.js</span>
+                  <span class="tag">Tailwind</span>
+                </div>
+              </article>
+              
+              <!-- Project 3 -->
+              <article class="project-card" data-index="2">
+                <span class="project-number">03 / 04</span>
+                <h3 class="project-name">Nova Design System</h3>
+                <p class="project-description">A lightweight, highly accessible UI library focusing on hardware-accelerated motion and strict typography systems.</p>
+                <div class="project-tags">
+                  <span class="tag">TypeScript</span>
+                  <span class="tag">Web Components</span>
+                  <span class="tag">CSS Variables</span>
+                </div>
+              </article>
+              
+              <!-- Project 4 -->
+              <article class="project-card" data-index="3">
+                <span class="project-number">04 / 04</span>
+                <h3 class="project-name">Synthesis</h3>
+                <p class="project-description">An audio-reactive visualizer that translates live microphone frequencies into beautiful, synchronized vector canvas patterns.</p>
+                <div class="project-tags">
+                  <span class="tag">Web Audio API</span>
+                  <span class="tag">Canvas API</span>
+                  <span class="tag">Vanilla JS</span>
+                </div>
+              </article>
+            </div>
+          </div>
+          
+          <div class="projects-visual-side">
+            <div class="projects-visual-container">
+              <!-- Visual 1 -->
+              <div class="project-visual active" data-index="0" data-tilt>
+                <div class="project-visual__bevel">
+                  <div class="project-visual__inner visual-odyssey">
+                    <div class="visual-art">
+                      <div class="planet sun"></div>
+                      <div class="planet earth"></div>
+                      <div class="orbit"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="stage__p">
-                <p>I want every project I touch to feel that way: integrated with how
-                   people <em>think</em>, <em>feel</em>, and <em>work</em>.</p>
+              
+              <!-- Visual 2 -->
+              <div class="project-visual" data-index="1" data-tilt>
+                <div class="project-visual__bevel">
+                  <div class="project-visual__inner visual-portal">
+                    <div class="visual-art">
+                      <div class="window">
+                        <div class="win-header"><span></span><span></span><span></span></div>
+                        <div class="win-body"><code>npm run dev</code></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Visual 3 -->
+              <div class="project-visual" data-index="2" data-tilt>
+                <div class="project-visual__bevel">
+                  <div class="project-visual__inner visual-nova">
+                    <div class="visual-art">
+                      <div class="button-element">Button</div>
+                      <div class="slider-element"><span></span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Visual 4 -->
+              <div class="project-visual" data-index="3" data-tilt>
+                <div class="project-visual__bevel">
+                  <div class="project-visual__inner visual-synthesis">
+                    <div class="visual-art">
+                      <div class="wave-line"></div>
+                      <div class="wave-line"></div>
+                      <div class="wave-line"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="stage__col stage__col--media" aria-hidden="true">
-          <div class="stage__particle-zone" data-particle></div>
+          
         </div>
       </div>
     </section>
 
-    <!-- ---------- LIVE ACTIVITY (Discord presence + GitHub contributions) ---------- -->
-    <section class="section activity" id="activity">
-      <div class="activity__head">
-        <h2 class="activity__heading" data-split-chars><span class="d-block">Currently</span></h2>
-        <p class="activity__lead" data-reveal>What I&rsquo;m up to right now &mdash; live from Discord and GitHub.
-          <span class="activity__note">(Placeholder data for now.)</span></p>
+    <!-- ---------- CONNECT ---------- -->
+    <section class="section connect-section" id="connect">
+      <div class="connect-section__inner">
+        
+        <header class="connect-section__head" data-reveal>
+          <span class="connect-section__eyebrow">Let's Connect</span>
+          <h2 class="connect-section__heading">Digital Presence</h2>
+          <p class="connect-section__lead">Find me on Discord or track my open-source contributions on GitHub. Let's build our network.</p>
+        </header>
+
+        <div class="connect-section__grid">
+          <!-- Discord card -->
+          <article class="presence" data-reveal>
+            <header class="presence__top">
+              <div class="presence__avatar">
+                <span class="presence__avatar-ph" aria-hidden="true">JV</span>
+                <span class="presence__dot presence__dot--online" id="discordDot"></span>
+              </div>
+              <div class="presence__id">
+                <h3 class="presence__name" id="discordName">Bruno</h3>
+                <p class="presence__state" id="discordState" aria-live="polite">Online</p>
+              </div>
+              <a href="https://discord.com/users/615484398392967168" target="_blank" rel="noopener noreferrer" class="presence__brand-link" aria-label="Discord Profile">
+                <svg class="presence__brand" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 0 0-4.8851-1.5152.0741.0741 0 0 0-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 0 0-.0785-.037 19.7363 19.7363 0 0 0-4.8852 1.515.0699.0699 0 0 0-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 0 0 .0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 0 0 .0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 0 0-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 0 1-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 0 1 .0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 0 1 .0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 0 1-.0066.1276 12.2986 12.2986 0 0 1-1.873.8914.0766.0766 0 0 0-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 0 0 .0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 0 0 .0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 0 0-.0312-.0286ZM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189Zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
+                </svg>
+              </a>
+            </header>
+            <div class="presence__activity" id="discordActivity">
+              <div class="presence__art" aria-hidden="true"><span>&#9658;</span></div>
+              <div class="presence__act-body">
+                <span class="presence__act-label" id="discordActLabel">Playing a game</span>
+                <span class="presence__act-title" id="discordActTitle">[ Activity name ]</span>
+                <span class="presence__act-detail" id="discordActDetail">[ What you&rsquo;re doing ]</span>
+                <span class="presence__act-state" id="discordActState">[ Status detail ]</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- GitHub contribution card -->
+          <article class="contrib" data-reveal>
+            <header class="contrib__top">
+              <div class="contrib__id">
+                <h3 class="contrib__name" id="ghName">jvoclarit01</h3>
+                <p class="contrib__sub"><span id="ghCount">0</span> contributions in the last year</p>
+              </div>
+              <a href="https://github.com/jvoclarit01" target="_blank" rel="noopener noreferrer" class="contrib__brand-link" aria-label="GitHub Profile">
+                <svg class="contrib__brand" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                </svg>
+              </a>
+            </header>
+            <div class="contrib__graph" id="contribGraph" role="img" aria-label="GitHub contribution graph"></div>
+            <footer class="contrib__legend">
+              <span>Less</span>
+              <span class="contrib__legend-cells" id="contribLegend" aria-hidden="true"></span>
+              <span>More</span>
+            </footer>
+          </article>
+        </div>
+
       </div>
+    </section>
 
-      <div class="activity__grid">
+    <!-- ---------- CONTACT ---------- -->
+    <section class="section contact-section" id="contact">
+      <div class="contact-section__inner">
+        
+        <header class="contact-section__head" data-reveal>
+          <h2 class="contact-section__heading">Get In Touch</h2>
+        </header>
 
-        <!-- Discord presence card -->
-        <article class="presence" data-reveal>
-          <header class="presence__top">
-            <div class="presence__avatar">
-              <span class="presence__avatar-ph" aria-hidden="true">DC</span>
-              <span class="presence__dot presence__dot--online" id="discordDot"></span>
+        <div class="contact-section__grid">
+          <!-- Email CTA & Links -->
+          <div class="contact-details-card" data-reveal>
+            <div class="contact-details__header">
+              <h3 class="contact-details__title">Let’s build something <span class="highlight">extraordinary together</span></h3>
+              <p class="contact-details__content">I am always open to discussing new projects, collaborative ideas, or web engineering opportunities. Drop me a line!</p>
             </div>
-            <div class="presence__id">
-              <h3 class="presence__name" id="discordName">[ your_handle ]</h3>
-              <p class="presence__state" id="discordState" aria-live="polite">Online</p>
-            </div>
-            <svg class="presence__brand" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor" d="M20.317 4.3698a19.7913 19.7913 0 0 0-4.8851-1.5152.0741.0741 0 0 0-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 0 0-.0785-.037 19.7363 19.7363 0 0 0-4.8852 1.515.0699.0699 0 0 0-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 0 0 .0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 0 0 .0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 0 0-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 0 1-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 0 1 .0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 0 1 .0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 0 1-.0066.1276 12.2986 12.2986 0 0 1-1.873.8914.0766.0766 0 0 0-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 0 0 .0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 0 0 .0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 0 0-.0312-.0286ZM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189Zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/>
-            </svg>
-          </header>
-
-          <div class="presence__activity" id="discordActivity">
-            <div class="presence__art" aria-hidden="true"><span>&#9658;</span></div>
-            <div class="presence__act-body">
-              <span class="presence__act-label" id="discordActLabel">Playing a game</span>
-              <span class="presence__act-title" id="discordActTitle">[ Activity name ]</span>
-              <span class="presence__act-detail" id="discordActDetail">[ What you&rsquo;re doing ]</span>
-              <span class="presence__act-state" id="discordActState">[ Status detail ]</span>
+            <div class="contact-methods">
+              <a href="mailto:janvincentoclarit01@gmail.com" class="contact-email-btn btn btn--lg">
+                <span class="btn__text">janvincentoclarit01@gmail.com</span>
+                <span class="btn__hover" aria-hidden="true"></span>
+              </a>
+              <div class="contact-social-links">
+                <a href="https://github.com/jvoclarit01" target="_blank" rel="noopener noreferrer" class="link-underline">GitHub</a>
+                <a href="https://www.linkedin.com/in/jan-vincent-oclarit" class="link-underline">LinkedIn</a>
+                <a href="https://www.upwork.com/freelancers/~0172cc238394e62987?mp_source=share" class="link-underline">Upwork</a>
+              </div>
             </div>
           </div>
-        </article>
 
-        <!-- GitHub contributions card -->
-        <article class="contrib" data-reveal>
-          <header class="contrib__top">
-            <div class="contrib__id">
-              <h3 class="contrib__name" id="ghName">[ your-github ]</h3>
-              <p class="contrib__sub"><span id="ghCount">0</span> contributions in the last year</p>
-            </div>
-            <svg class="contrib__brand" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-            </svg>
-          </header>
-
-          <div class="contrib__graph" id="contribGraph" role="img" aria-label="GitHub contribution graph (placeholder data)"></div>
-
-          <footer class="contrib__legend">
-            <span>Less</span>
-            <span class="contrib__legend-cells" id="contribLegend" aria-hidden="true"></span>
-            <span>More</span>
-          </footer>
-        </article>
+          <!-- Contact Form -->
+          <div class="contact-form-card" data-reveal>
+            <form id="contactForm" class="contact-form" novalidate>
+              <div class="form-group">
+                <label for="formName" class="form-label">Full Name</label>
+                <input type="text" id="formName" name="name" class="form-input" placeholder="Enter your name" required />
+              </div>
+              <div class="form-group">
+                <label for="formEmail" class="form-label">Email Address</label>
+                <input type="email" id="formEmail" name="email" class="form-input" placeholder="Enter your email" required />
+              </div>
+              <div class="form-group">
+                <label for="formMessage" class="form-label">Message</label>
+                <textarea id="formMessage" name="message" class="form-textarea" placeholder="How can I help you?" required></textarea>
+              </div>
+              <div class="form-submit-container">
+                <button type="submit" class="btn btn--lg btn-submit">
+                  <span class="btn__text">Send Message</span>
+                  <span class="btn__hover" aria-hidden="true"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
 
       </div>
-    </section>
-
-    <!-- ---------- TOOLS / STACK STRIP ---------- -->
-    <section class="section logos" id="stack">
-      <div class="logos__head" data-reveal>
-        <h2 class="logos__heading" data-split-chars><span class="d-block">Tools &amp; stack</span></h2>
-        <p class="logos__lead">The kit I reach for. Swap in whatever you actually use.</p>
-      </div>
-      <ul class="logos__grid">
-        <li data-reveal>Figma</li>
-        <li data-reveal>Framer</li>
-        <li data-reveal>React</li>
-        <li data-reveal>Next.js</li>
-        <li data-reveal>Three.js</li>
-        <li data-reveal>GSAP</li>
-        <li data-reveal>TypeScript</li>
-        <li data-reveal>Tailwind</li>
-      </ul>
-    </section>
-
-    <!-- ---------- FINAL CTA ---------- -->
-    <section class="section cta" id="contact">
-      <h2 class="cta__heading">
-        <span class="cta__line" data-split-chars>Let&rsquo;s build</span>
-        <span class="cta__line" data-split-chars>something good.</span>
-      </h2>
-      <a href="mailto:you@email.com" class="btn btn--lg">
-        <span class="btn__text">you@email.com</span>
-        <span class="btn__hover" aria-hidden="true"></span>
-      </a>
     </section>
   </main>
 
@@ -342,19 +415,20 @@
   <footer class="footer">
     <div class="footer__inner container">
       <div class="footer__copy">
-        <span>&copy; 2026 [ Your Name ].</span>
+        <span>&copy; 2026 Jan Vincent Oclarit.</span>
         <span>All rights reserved.</span>
       </div>
       <ul class="footer__nav">
-        <li><a href="#work" data-split-chars>Work</a></li>
+        <li><a href="#home" data-split-chars>Home</a></li>
         <li><a href="#about" data-split-chars>About</a></li>
-        <li><a href="#activity" data-split-chars>Activity</a></li>
+        <li><a href="#projects" data-split-chars>Projects</a></li>
+        <li><a href="#connect" data-split-chars>Connect</a></li>
         <li><a href="#contact" data-split-chars>Contact</a></li>
       </ul>
       <div class="footer__social">
+        <a href="https://github.com/jvoclarit01" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GitHub</a>
         <a href="#" aria-label="LinkedIn">LinkedIn</a>
-        <a href="#" aria-label="Twitter">Twitter</a>
-        <a href="mailto:you@email.com" aria-label="Email">Email</a>
+        <a href="mailto:janvincentoclarit01@gmail.com" aria-label="Email">Email</a>
       </div>
     </div>
   </footer>

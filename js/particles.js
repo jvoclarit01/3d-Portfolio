@@ -54,34 +54,166 @@ function gradAt(y) {
 // ------------------------------------------------------------
 //  shape generators -> Float32Array(N*3)
 // ------------------------------------------------------------
-function spherePt() {
-  const u = Math.random(), v = Math.random();
-  const th = Math.acos(2 * u - 1), ph = 2 * Math.PI * v;
-  return [Math.sin(th) * Math.cos(ph), Math.cos(th), Math.sin(th) * Math.sin(ph)];
-}
-function sCube(s) {
-  const side = Math.ceil(Math.cbrt(N)), total = side * side * side;
-  const idx = []; for (let i = 0; i < total; i++) idx.push(i);
-  for (let i = total - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
-  const a = new Float32Array(N * 3), step = (2 * s) / (side - 1);
-  for (let n = 0; n < N; n++) {
-    const id = idx[n], ix = id % side, iy = ((id / side) | 0) % side, iz = (id / (side * side)) | 0;
-    a[n * 3] = -s + ix * step;
-    a[n * 3 + 1] = -s + iy * step;
-    a[n * 3 + 2] = -s + iz * step;
-  }
-  return a;
-}
-function sSphere(R) {
-  const a = new Float32Array(N * 3), phi = Math.PI * (3 - Math.sqrt(5));
+function sTorus(R, r) {
+  const a = new Float32Array(N * 3);
   for (let i = 0; i < N; i++) {
-    const y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), th = phi * i;
-    a[i * 3] = Math.cos(th) * r * R; a[i * 3 + 1] = y * R; a[i * 3 + 2] = Math.sin(th) * r * R;
+    const theta = i * Math.PI * 2 * 0.618033; // golden ratio spacing
+    const phi = (i / N) * Math.PI * 2;
+    a[i * 3] = (R + r * Math.cos(theta)) * Math.cos(phi);
+    a[i * 3 + 1] = (R + r * Math.cos(theta)) * Math.sin(phi);
+    a[i * 3 + 2] = r * Math.sin(theta);
   }
   return a;
 }
-// spread across the whole screen, biased far into -z for depth
+
+function sLaptop() {
+  const a = new Float32Array(N * 3);
+  const baseCount = Math.floor(N * 0.45);
+  const screenCount = N - baseCount;
+  
+  // Keyboard/Base plane
+  const baseRows = Math.floor(Math.sqrt(baseCount * 0.7));
+  const baseCols = Math.ceil(baseCount / baseRows);
+  for (let i = 0; i < baseCount; i++) {
+    const col = i % baseCols, row = Math.floor(i / baseCols);
+    const px = col / (baseCols - 1 || 1), pz = row / (baseRows - 1 || 1);
+    a[i * 3] = (px - 0.5) * 8.2;
+    a[i * 3 + 1] = -2.5;
+    a[i * 3 + 2] = (pz - 0.5) * 4.2 + 0.8;
+  }
+  
+  // Tilted Screen plane
+  const screenRows = Math.floor(Math.sqrt(screenCount * 0.75));
+  const screenCols = Math.ceil(screenCount / screenRows);
+  for (let i = 0; i < screenCount; i++) {
+    const idx = baseCount + i;
+    const col = i % screenCols, row = Math.floor(i / screenCols);
+    const px = col / (screenCols - 1 || 1), py = row / (screenRows - 1 || 1);
+    const x = (px - 0.5) * 8.2;
+    const y = (py - 0.5) * 5.2 + 0.2;
+    const z = -1.2 - (y + 2.5) * 0.25; // tilted screen
+    a[idx * 3] = x;
+    a[idx * 3 + 1] = y;
+    a[idx * 3 + 2] = z;
+  }
+  return a;
+}
+
+function sWaveGrid() {
+  const a = new Float32Array(N * 3);
+  const rows = Math.floor(Math.sqrt(N * 0.65));
+  const cols = Math.ceil(N / rows);
+  for (let i = 0; i < N; i++) {
+    const col = i % cols, row = Math.floor(i / cols);
+    const px = col / (cols - 1 || 1), pz = row / (rows - 1 || 1);
+    a[i * 3] = (px - 0.5) * 22.0;
+    a[i * 3 + 1] = 0.0;
+    a[i * 3 + 2] = (pz - 0.5) * 12.0;
+  }
+  return a;
+}
+
+function sChatBubble() {
+  const a = new Float32Array(N * 3);
+  const bubbleCount = Math.floor(N * 0.85);
+  const tailCount = N - bubbleCount;
+  
+  const w = 8.5, h = 5.8;
+  for (let i = 0; i < bubbleCount; i++) {
+    const t = (i / bubbleCount) * 2 * (w + h);
+    let x, y;
+    if (t < w) { x = t - w/2; y = h/2; }
+    else if (t < w + h) { x = w/2; y = h/2 - (t - w); }
+    else if (t < 2*w + h) { x = w/2 - (t - w - h); y = -h/2; }
+    else { x = -w/2; y = -h/2 + (t - 2*w - h); }
+    
+    const fill = Math.random();
+    a[i * 3] = x * fill;
+    a[i * 3 + 1] = y * fill + 0.5;
+    a[i * 3 + 2] = (Math.random() - 0.5) * 1.0;
+  }
+  
+  for (let i = 0; i < tailCount; i++) {
+    const idx = bubbleCount + i;
+    const pct = i / (tailCount - 1 || 1);
+    a[idx * 3] = -2.0 - pct * 1.6;
+    a[idx * 3 + 1] = -2.4 - pct * 1.6 + 0.5;
+    a[idx * 3 + 2] = (Math.random() - 0.5) * 1.0;
+  }
+  return a;
+}
+
 function sScatter() {
+  const a = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const arm = i % 3;
+    const theta = (i / N) * Math.PI * 6.5;
+    const r = 0.8 + 1.8 * theta;
+    const angle = theta + arm * (Math.PI * 2 / 3) + (Math.random() - 0.5) * 0.22;
+    a[i * 3] = Math.cos(angle) * r;
+    a[i * 3 + 1] = Math.sin(angle) * r;
+    a[i * 3 + 2] = (Math.random() - 0.5) * 3.5;
+  }
+  return a;
+}
+
+function sSphere(R) {
+  const a = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const y = 1 - (i / (N - 1)) * 2;
+    const radius = Math.sqrt(1 - y * y);
+    const theta = i * Math.PI * 2 * 0.6180339887;
+    a[i * 3] = Math.cos(theta) * radius * R;
+    a[i * 3 + 1] = y * R;
+    a[i * 3 + 2] = Math.sin(theta) * radius * R;
+  }
+  return a;
+}
+
+function sHelix() {
+  const a = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const strand = i % 2;
+    const theta = (i / N) * Math.PI * 12.0;
+    const r = 2.0;
+    const offset = strand * Math.PI;
+    const y = -4.5 + 9.0 * (i / N);
+    a[i * 3] = Math.cos(theta + offset) * r;
+    a[i * 3 + 1] = y;
+    a[i * 3 + 2] = Math.sin(theta + offset) * r;
+  }
+  return a;
+}
+
+function sVortex() {
+  const a = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const theta = (i / N) * Math.PI * 26.0;
+    const r = 2.2 + Math.sin(theta * 3.0) * 0.3;
+    const z = -5.0 + 10.0 * (i / N);
+    a[i * 3] = Math.cos(theta) * r;
+    a[i * 3 + 1] = Math.sin(theta) * r;
+    a[i * 3 + 2] = z;
+  }
+  return a;
+}
+
+function sCloud() {
+  const a = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const u = Math.random();
+    const v = Math.random();
+    const theta = u * 2.0 * Math.PI;
+    const phi = Math.acos(2.0 * v - 1.0);
+    const r = 0.5 + 4.2 * Math.pow(Math.random(), 1.8);
+    a[i * 3] = Math.sin(phi) * Math.cos(theta) * r;
+    a[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * r;
+    a[i * 3 + 2] = Math.cos(phi) * r;
+  }
+  return a;
+}
+
+function sContactScatter() {
   const a = new Float32Array(N * 3);
   for (let i = 0; i < N; i++) {
     a[i * 3] = (Math.random() - 0.5) * 38;
@@ -91,11 +223,28 @@ function sScatter() {
   return a;
 }
 
-const cubeArr = sCube(3.3);
-const sphereArr = sSphere(4.5);
-const scatterArr = sScatter();
-// hero, about, work, philosophy, activity, stack, contact
-const SH = [cubeArr, sphereArr, scatterArr, scatterArr, scatterArr, scatterArr, sphereArr];
+const torusArr = sTorus(4.2, 1.3);
+const laptopArr = sLaptop();
+const waveGridArr = sWaveGrid();
+const sphereArr = sSphere(3.8);
+const chatBubbleArr = sChatBubble();
+const scatterArr = sScatter(); // Spiral Galaxy
+const helixArr = sHelix();     // Double Helix
+const vortexArr = sVortex();   // Vortex Tunnel
+const cloudArr = sCloud();     // Spherical Cloud
+const contactScatterArr = sContactScatter();
+
+// Stages: 
+// 0 = Home (Torus)
+// 1 = Transition (Double Helix)
+// 2 = About (Laptop)
+// 3 = Transition (Vortex Tunnel)
+// 4 = Projects (WaveGrid)
+// 5 = Transition (Spiral Galaxy)
+// 6 = Connect (Sphere)
+// 7 = Transition (Spherical Cloud)
+// 8 = Contact (Scattered)
+const SH = [torusArr, helixArr, laptopArr, vortexArr, waveGridArr, scatterArr, sphereArr, cloudArr, contactScatterArr];
 
 // ------------------------------------------------------------
 //  per-cube data (no spin)
@@ -103,7 +252,13 @@ const SH = [cubeArr, sphereArr, scatterArr, scatterArr, scatterArr, scatterArr, 
 const zeros = [], ones = [];
 for (let k = 0; k < N; k++) {
   const p = SH.map((arr) => new THREE.Vector3(arr[k * 3], arr[k * 3 + 1], arr[k * 3 + 2]));
-  const cube = { p: p, disp: new THREE.Vector3(), vel: new THREE.Vector3() };
+  const cube = { 
+    p: p, 
+    disp: new THREE.Vector3(), 
+    vel: new THREE.Vector3(),
+    waveBaseX: waveGridArr[k * 3],
+    waveBaseZ: waveGridArr[k * 3 + 2]
+  };
   (Math.random() > 0.5 ? ones : zeros).push(cube);
 }
 
@@ -137,25 +292,51 @@ scene.add(cubeGroup);
 // ------------------------------------------------------------
 //  scroll -> stage mapping
 // ------------------------------------------------------------
-const STAGE_IDS  = ["hero", "about", "work", "philosophy", "activity", "stack", "contact"];
-const stageX      = [4.5, -4.5, 0.0, 0.0, 0.0, 0.0, 0.0]; // scatter + contact centered
-const stageBright = [1.0, 1.0, 0.55, 0.72, 0.55, 0.55, 1.0];
+const STAGE_IDS  = ["home", "about", "projects", "connect", "contact"];
+const stageX      = [4.5, 0.0, -4.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]; 
+const stageBright = [1.0, 0.6, 1.0, 0.6, 0.8, 0.6, 1.0, 0.6, 1.0];
 let anchors = [];
 function computeAnchors() {
   const vh = window.innerHeight;
   anchors = STAGE_IDS.map(function (id) {
     const el = document.getElementById(id); if (!el) return 0;
     const r = el.getBoundingClientRect();
-    return r.top + window.scrollY + r.height / 2 - vh / 2;
+    const scrollTop = r.top + window.scrollY;
+    if (id === "projects") {
+      return scrollTop + vh / 2;
+    }
+    return scrollTop + r.height / 2 - vh / 2;
   });
 }
 function targetStage(y) {
   if (!anchors.length) return 0;
   if (y <= anchors[0]) return 0;
-  for (let k = 1; k < anchors.length; k++) {
-    if (y < anchors[k]) { const span = Math.max(1, anchors[k] - anchors[k - 1]); return (k - 1) + (y - anchors[k - 1]) / span; }
+  if (y >= anchors[anchors.length - 1]) return 8;
+  
+  for (let k = 0; k < anchors.length - 1; k++) {
+    const a0 = anchors[k];
+    const a1 = anchors[k + 1];
+    
+    if (y >= a0 && y < a1) {
+      if (STAGE_IDS[k] === "projects") {
+        const el = document.getElementById("projects");
+        if (el) {
+          const r = el.getBoundingClientRect();
+          const projectsTop = r.top + window.scrollY;
+          const projectsBottom = projectsTop + r.height - window.innerHeight;
+          if (y < projectsBottom) {
+            return 4;
+          } else {
+            const t = (y - projectsBottom) / (a1 - projectsBottom);
+            return 4 + t * 2;
+          }
+        }
+      }
+      const t = (y - a0) / (a1 - a0);
+      return 2 * k + t * 2;
+    }
   }
-  return anchors.length - 1;
+  return 8;
 }
 const lerp = (a, b, t) => a + (b - a) * t;
 const clamp01 = (t) => Math.max(0, Math.min(1, t));
@@ -184,6 +365,10 @@ let dispStage = 0, stageVel = 0;
 const STIFF = 0.025, DAMP = 0.84;                  // morph spring (smooth + slight bounce)
 let curX = stageX[0] * xScale, curB = stageBright[0];
 const HOV_R = 3.4, HOV_R2 = HOV_R * HOV_R, HOV_STR = 0.13, HOV_SPRING = 0.10, HOV_DAMP = 0.86, HOV_MAX = 2.2;
+
+// Scroll-driven wave modulation globals
+window.waveScrollOffset = 0;
+window.waveIntensity = 1.0;
 
 function morphMesh(part, i, te, interactive, lmx, lmy) {
   const arr = part.arr, mesh = part.mesh;
@@ -221,6 +406,26 @@ function draw(staticFrame) {
   const frac = clamp01(dispStage - i);
   const te = easeInOut(frac);
 
+  // Dynamic wave update in the render draw loop:
+  const time = performance.now() * 0.0016 + window.waveScrollOffset;
+  const lists = [zeros, ones];
+  for (let l = 0; l < lists.length; l++) {
+    const list = lists[l];
+    for (let n = 0; n < list.length; n++) {
+      const c = list[n];
+      const wx = c.waveBaseX;
+      const wz = c.waveBaseZ;
+      const height = Math.sin(wx * 0.35 + time) * Math.cos(wz * 0.35 + time * 0.8) * 1.6 
+                     + Math.sin(wx * 0.12 - time * 0.5) * 0.8;
+      c.p[4].y = height * window.waveIntensity;
+    }
+  }
+
+  // Decay wave scroll intensity back to baseline
+  if (window.waveIntensity > 1.0) {
+    window.waveIntensity += (1.0 - window.waveIntensity) * 0.05;
+  }
+
   const tX = lerp(stageX[i], stageX[i + 1], frac) * xScale;
   const tB = lerp(stageBright[i], stageBright[i + 1], frac);
   const k = staticFrame ? 1 : 0.1;
@@ -240,6 +445,18 @@ function draw(staticFrame) {
   camera.position.x = mouse.nx * 0.6;
   camera.position.y = mouse.ny * 0.45;
   camera.lookAt(0, 0, 0);
+
+  // Project the WebGL cubeGroup center to screen space to align the profile picture
+  const heroPic = document.querySelector('.hero-profile-pic');
+  if (heroPic) {
+    const tempV = new THREE.Vector3();
+    tempV.copy(cubeGroup.position);
+    tempV.project(camera);
+    const px = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+    const py = (tempV.y * -0.5 + 0.5) * window.innerHeight;
+    heroPic.style.left = px + 'px';
+    heroPic.style.top = py + 'px';
+  }
 
   renderer.render(scene, camera);
 }
