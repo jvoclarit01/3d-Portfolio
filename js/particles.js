@@ -94,8 +94,8 @@ function sScatter() {
 const cubeArr = sCube(3.3);
 const sphereArr = sSphere(4.5);
 const scatterArr = sScatter();
-// hero, about, work, philosophy, activity, stack, contact
-const SH = [cubeArr, sphereArr, scatterArr, scatterArr, scatterArr, scatterArr, sphereArr];
+// hero, about, projects, certs, activity, contact
+const SH = [cubeArr, sphereArr, scatterArr, scatterArr, sphereArr, sphereArr];
 
 // ------------------------------------------------------------
 //  per-cube data (no spin)
@@ -137,9 +137,10 @@ scene.add(cubeGroup);
 // ------------------------------------------------------------
 //  scroll -> stage mapping
 // ------------------------------------------------------------
-const STAGE_IDS  = ["hero", "about", "work", "philosophy", "activity", "stack", "contact"];
-const stageX      = [4.5, -4.5, 0.0, 0.0, 0.0, 0.0, 0.0]; // scatter + contact centered
-const stageBright = [1.0, 1.0, 0.55, 0.72, 0.55, 0.55, 1.0];
+// ambient, centered, dim — sits behind the content-dense redesign
+const STAGE_IDS  = ["hero", "about", "projects", "certs", "activity", "contact"];
+const stageX      = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+const stageBright = [0.5, 0.32, 0.34, 0.3, 0.32, 0.45];
 let anchors = [];
 function computeAnchors() {
   const vh = window.innerHeight;

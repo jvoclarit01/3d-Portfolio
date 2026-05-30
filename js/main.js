@@ -261,11 +261,67 @@
     });
   }
 
+  // ---------- project filter tabs ----------
+  function initFilters() {
+    var bar = document.getElementById("projectFilters");
+    var grid = document.getElementById("projectGrid");
+    if (!bar || !grid) return;
+    var btns = bar.querySelectorAll(".filter");
+    var cards = grid.querySelectorAll(".card");
+    bar.addEventListener("click", function (e) {
+      var b = e.target.closest(".filter"); if (!b) return;
+      btns.forEach(function (x) { x.classList.remove("is-active"); x.setAttribute("aria-selected", "false"); });
+      b.classList.add("is-active"); b.setAttribute("aria-selected", "true");
+      var f = b.getAttribute("data-filter");
+      cards.forEach(function (c) {
+        c.classList.toggle("is-hidden", !(f === "all" || c.getAttribute("data-cat") === f));
+      });
+    });
+  }
+
+  // ---------- contact form (no backend: opens the user's mail app) ----------
+  function initContactForm() {
+    var form = document.getElementById("contactForm");
+    var note = document.getElementById("formNote");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        if (note) note.textContent = "Please fill in the required fields.";
+        if (form.reportValidity) form.reportValidity();
+        return;
+      }
+      var subj = encodeURIComponent(form.subject.value || "Hello from your portfolio");
+      var body = encodeURIComponent((form.message.value || "") + "\n\n— " + (form.name.value || "") + " (" + (form.email.value || "") + ")");
+      if (note) note.textContent = "Opening your email app…";
+      window.location.href = "mailto:you@email.com?subject=" + subj + "&body=" + body;
+      setTimeout(function () { if (note) note.textContent = "Thanks! If your mail app didn't open, email you@email.com directly."; }, 900);
+    });
+  }
+
+  // ---------- hero role rotator ----------
+  function initRoleRotate() {
+    var el = document.getElementById("roleRotate");
+    if (!el) return;
+    var roles = (el.getAttribute("data-roles") || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+    if (roles.length < 2 || reduceMotion) return;
+    el.style.transition = "opacity .26s ease, transform .26s ease";
+    var i = 0;
+    setInterval(function () {
+      i = (i + 1) % roles.length;
+      el.style.opacity = "0"; el.style.transform = "translateY(6px)";
+      setTimeout(function () { el.textContent = roles[i]; el.style.opacity = "1"; el.style.transform = "none"; }, 260);
+    }, 2200);
+  }
+
   // ---------- boot ----------
   function init() {
     buildSplits();
     initContrib();
     initPresence();
+    initFilters();
+    initContactForm();
+    initRoleRotate();
     initTilt();
     runLoader(function () {
       revealHero();
