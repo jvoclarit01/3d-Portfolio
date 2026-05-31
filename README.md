@@ -2,7 +2,7 @@
 
 An animated, dark-theme creative portfolio website featuring a WebGL particle hero, dynamic grid systems, and a drifting field of binary parallax particles. Built with a focus on tactile digital experiences, high-fidelity typography, and expressive motion.
 
-👉 **Live Site:** [jvoclarit01.github.io/3d-Portfolio](https://jvoclarit01.github.io/3d-Portfolio/)
+👉 **Live Site:** [jvoclarit.pages.dev](https://jvoclarit.pages.dev/)
 
 ---
 
@@ -40,7 +40,7 @@ Then open `http://localhost:8099` in your browser.
 
 ## 📦 Deployment
 
-The project is configured for deployment on **GitHub Pages**. To deploy your own copy:
-1. Go to your repository settings on GitHub.
-2. Select **Pages** from the sidebar.
-3. Choose the `main` branch under **Build and deployment** and click **Save**.
+The project is configured for deployment on **Cloudflare Pages**. To deploy your own copy:
+1. Push your repository to GitHub or GitLab.
+2. Connect your repository to **Cloudflare Pages** in the Cloudflare dashboard.
+3. Keep the build settings default/empty (since it is a static HTML/JS site) and click **Save and Deploy**.
