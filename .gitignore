@@ -2,9 +2,12 @@
 .DS_Store
 Thumbs.db
 *.log
+.vscode/
+.idea/
 
 # tooling
 .playwright-cli/
+.antigravitycli/
 node_modules/
 
 # local media (large source assets kept out of the repo)
@@ -12,3 +15,4 @@ node_modules/
 *.webm
 frames/
 dala-frames/
+
