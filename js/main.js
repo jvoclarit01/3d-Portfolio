@@ -631,18 +631,39 @@
       btn.style.pointerEvents = "none";
       btn.style.opacity = "0.8";
       
-      setTimeout(function () {
-        btnText.textContent = "Message Sent!";
-        btn.style.background = "#10b981";
-        form.reset();
-        
+      var formData = new FormData(form);
+      
+      fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        if (data.success) {
+          btnText.textContent = "Message Sent!";
+          btn.style.setProperty("background", "#10b981", "important");
+          form.reset();
+        } else {
+          btnText.textContent = "Error!";
+          btn.style.setProperty("background", "#ef4444", "important");
+          alert(data.message || "Something went wrong. Please try again.");
+        }
+      })
+      .catch(function (error) {
+        btnText.textContent = "Error!";
+        btn.style.setProperty("background", "#ef4444", "important");
+        alert("Failed to send message. Please check your network connection.");
+      })
+      .finally(function () {
         setTimeout(function () {
           btnText.textContent = originalText;
           btn.style.pointerEvents = "";
           btn.style.opacity = "";
-          btn.style.background = "";
+          btn.style.removeProperty("background");
         }, 3000);
-      }, 1500);
+      });
     });
   }
 

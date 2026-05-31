@@ -1197,6 +1197,32 @@ h1, h2, h3, h4, .hero2__title, .feature__heading, .projects-main-title, .connect
   transform: scale(0.97) !important;
 }
 
+/* Primary CTA — the one place the full gradient earns its keep.
+   Reserved for the single most important action (Contact / Send Message);
+   every other button stays on the cyan HUD style to preserve hierarchy. */
+.btn--primary {
+  border-color: transparent !important;
+  color: #06060c !important;
+  font-weight: 700 !important;
+  background: linear-gradient(110deg, var(--accent) 0%, var(--accent-2) 48%, var(--accent-soft) 100%) !important;
+  background-size: 220% 100% !important;
+  background-position: 0% 0 !important;
+  box-shadow: 0 6px 18px -6px rgba(255, 0, 127, .45) !important;
+  transition: background-position .6s var(--ease), box-shadow .35s var(--ease), transform .25s var(--ease) !important;
+}
+.btn--primary .btn__hover { display: none !important; } /* gradient replaces the cyan wipe */
+.btn--primary:hover {
+  color: #06060c !important;
+  background-position: 100% 0 !important;
+  box-shadow: 0 0 22px rgba(255, 0, 127, .35), 0 0 34px rgba(0, 243, 255, .28) !important;
+  transform: translateY(-2px);
+}
+.btn--primary:active { transform: translateY(0) scale(.98) !important; }
+@media (prefers-reduced-motion: reduce) {
+  .btn--primary { transition: box-shadow .2s var(--ease) !important; }
+  .btn--primary:hover { transform: none; }
+}
+
 /* Profile picture glowing frame update */
 .hero-profile-pic {
   border-radius: var(--radius) !important;

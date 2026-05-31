@@ -55,7 +55,7 @@
           <li class="nav__item"><a href="#about" class="nav__link" data-split-chars>About</a></li>
           <li class="nav__item"><a href="#projects" class="nav__link" data-split-chars>Projects</a></li>
           <li class="nav__item"><a href="#connect" class="nav__link" data-split-chars>Connect</a></li>
-          <li class="nav__item"><a href="#contact" class="btn"><span class="btn__text">Contact</span><span class="btn__hover" aria-hidden="true"></span></a></li>
+          <li class="nav__item"><a href="#contact" class="btn btn--primary"><span class="btn__text">Contact</span><span class="btn__hover" aria-hidden="true"></span></a></li>
         </ul>
       </nav>
     </div>
@@ -403,6 +403,9 @@
           <!-- Contact Form -->
           <div class="contact-form-card" data-reveal>
             <form id="contactForm" class="contact-form" novalidate>
+              <!-- Web3Forms Access Key: Replace value with your key from https://web3forms.com -->
+              <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
+
               <div class="form-group">
                 <label for="formName" class="form-label">Full Name</label>
                 <input type="text" id="formName" name="name" class="form-input" placeholder="Enter your name" required />
@@ -416,7 +419,7 @@
                 <textarea id="formMessage" name="message" class="form-textarea" placeholder="How can I help you?" required></textarea>
               </div>
               <div class="form-submit-container">
-                <button type="submit" class="btn btn--lg btn-submit">
+                <button type="submit" class="btn btn--lg btn-submit btn--primary">
                   <span class="btn__text">Send Message</span>
                   <span class="btn__hover" aria-hidden="true"></span>
                 </button>
