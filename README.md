@@ -1,40 +1,46 @@
-# 3D Portfolio
+# Jan Vincent Oclarit — Creative Engineer & 3D Web Developer
 
-An animated, dark-theme portfolio website with a WebGL particle hero and a drifting field of binary `0` / `1` glyphs. Built as a faithful, reusable recreation of the motion and layout language of [dala.craftedbygc.com](https://dala.craftedbygc.com/), adapted into a portfolio template with placeholder content.
+An animated, dark-theme creative portfolio website featuring a WebGL particle hero, dynamic grid systems, and a drifting field of binary parallax particles. Built with a focus on tactile digital experiences, high-fidelity typography, and expressive motion.
 
-## Features
+👉 **Live Site:** [jvoclarit01.github.io/3d-Portfolio](https://jvoclarit01.github.io/3d-Portfolio/)
 
-- **Intro loader** — gradient spinner, wipe-in name heading, `0 → 100` progress counter
-- **WebGL hero** — a morphing particle blob (Three.js) that drifts and fades on scroll
-- **Binary particle field** — floating `0` and `1` glyphs in the brand palette, with cursor parallax
-- **Expressive motion** — per-character heading reveals, per-line rotate-in paragraphs, nav char-wipe hover, pill buttons with fill-up hover, scroll-triggered reveals
-- **Accessible & responsive** — skip link, visible focus rings, keyboard-operable carousel, readability scrim, full `prefers-reduced-motion` fallback, no horizontal overflow
+---
 
-## Tech
+## 🚀 Features
 
-- Vanilla HTML / CSS / JavaScript (no build step)
-- [Three.js](https://threejs.org/) via ES-module CDN + importmap
-- Inter (display/body) + Georgia (italic emphasis)
+* **WebGL Particle Hero** — A morphing, interactive particle sphere (Three.js) that responds to cursor drift and fades out smoothly on scroll.
+* **Binary Particle Field** — Floating floating `0` and `1` glyphs in the brand palette, reacting to mouse parallax coordinates.
+* **Intro Loader** — A progressive loading sequence with a `0 → 100` counter, reveal transitions, and text wipes.
+* **Dynamic Header & Footer** — A sticky glassmorphic navigation bar that becomes compact and blurred on scroll, matching a solid blurred footer.
+* **Interactive Connect Form** — A fully-functioning AJAX message form integrated with **Web3Forms** for client-side messaging with custom success/error visual states.
+* **Responsive & Accessible** — Features keyboard-accessible navigation, a skips link, focus indicators, and fully-responsive typography.
 
-## Run locally
+---
 
-ES modules and the Three.js CDN require the site to be served over HTTP (not opened as a `file://`):
+## 🛠️ Tech Stack
+
+* **Core:** Vanilla HTML5, CSS3 Custom Properties (CSS variables), Modern JavaScript (ES Modules).
+* **3D Graphics:** [Three.js](https://threejs.org/) (via importmap and CDN).
+* **Form Services:** [Web3Forms API](https://web3forms.com/) for serverless form submissions.
+* **Typography:** Orbitron (Display) + JetBrains Mono (Sanskrit Monospace).
+
+---
+
+## 💻 Local Development
+
+Since the project uses ES Modules and the Three.js CDN, you must serve the site over HTTP rather than opening the file directly:
 
 ```bash
+# Python 3
 python -m http.server 8099
-# then open http://127.0.0.1:8099/
 ```
+Then open `http://localhost:8099` in your browser.
 
-## Customize
+---
 
-Replace the placeholders throughout `index.html`:
+## 📦 Deployment
 
-- `[ Your Name ]` — name / brand
-- `[ Project One ]` … `[ Project Four ]` — case studies in **Selected work**
-- `[ Company One ]` … `[ Company Three ]` — roles in **Experience**
-- `you@email.com` — contact email
-- `Tools & stack` items and footer social links (`href="#"`)
-
-## Credits
-
-Motion and layout inspired by the Dala marketing site. All content here is placeholder.
+The project is configured for deployment on **GitHub Pages**. To deploy your own copy:
+1. Go to your repository settings on GitHub.
+2. Select **Pages** from the sidebar.
+3. Choose the `main` branch under **Build and deployment** and click **Save**.
