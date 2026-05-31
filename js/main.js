@@ -189,100 +189,141 @@
     requestAnimationFrame(step);
   }
 
-  // ---------- GitHub contribution graph ----------
-  function initContrib() {
+  // ---------- GitHub Activity: live signals ----------
+  function initGitHubSignals() {
     var graph = document.getElementById("contribGraph");
-    var legend = document.getElementById("contribLegend");
-    var countEl = document.getElementById("ghCount");
     if (!graph) return;
 
-    // Generate placeholder grid immediately for loading state
-    var WEEKS = 52;
+    var GH_USER = "jvoclarit01";
+    var LEVEL_MAP = { NONE: 0, FIRST_QUARTILE: 1, SECOND_QUARTILE: 2, THIRD_QUARTILE: 3, FOURTH_QUARTILE: 4 };
+    var SYNC_INTERVAL = 90000; // re-sync every 90s
+
+    var el = {
+      cur: document.getElementById("statCurStreak"),
+      longest: document.getElementById("statLongStreak"),
+      total: document.getElementById("statTotal"),
+      active: document.getElementById("statActive"),
+      best: document.getElementById("statBest"),
+      repos: document.getElementById("statRepos"),
+      sync: document.getElementById("ghSync"),
+      syncWrap: document.getElementById("ghSyncWrap")
+    };
+    var hasAnimated = false; // count-up only on first reveal; later syncs snap
+
+    // placeholder heatmap so the panel never looks empty while loading
     var frag = document.createDocumentFragment();
-    for (var w = 0; w < WEEKS; w++) {
+    for (var w = 0; w < 53; w++) {
       for (var d = 0; d < 7; d++) {
-        var cell = document.createElement("span");
-        cell.className = "contrib__cell";
-        cell.setAttribute("data-level", 0);
-        frag.appendChild(cell);
+        var ph = document.createElement("span");
+        ph.className = "contrib__cell";
+        ph.setAttribute("data-level", 0);
+        frag.appendChild(ph);
       }
     }
     graph.appendChild(frag);
 
-    if (legend && legend.children.length === 0) {
-      for (var l = 0; l <= 4; l++) {
-        var c = document.createElement("span");
-        c.className = "contrib__cell";
-        c.setAttribute("data-level", l);
-        legend.appendChild(c);
+    function fmtTime(date) {
+      var h = date.getHours(), m = date.getMinutes();
+      var ap = h >= 12 ? "PM" : "AM";
+      h = h % 12; if (h === 0) h = 12;
+      return h + ":" + (m < 10 ? "0" + m : m) + " " + ap;
+    }
+
+    function putStat(node, val) {
+      if (!node) return;
+      if (hasAnimated || reduceMotion) { node.textContent = val.toLocaleString(); }
+      else { animateCount(node, val); }
+    }
+
+    // Flatten weeks -> days (chronological) and derive streaks/totals.
+    function computeStats(data) {
+      var days = [];
+      data.contributions.forEach(function (week) {
+        week.forEach(function (day) { days.push(day.contributionCount || 0); });
+      });
+      var total = 0, active = 0, best = 0, longest = 0, run = 0;
+      days.forEach(function (n) {
+        total += n;
+        if (n > 0) { active++; if (n > best) best = n; run++; if (run > longest) longest = run; }
+        else run = 0;
+      });
+      // current streak: count back from the end; allow today (last cell) to be 0
+      var cur = 0;
+      for (var i = days.length - 1; i >= 0; i--) {
+        if (days[i] > 0) cur++;
+        else if (i === days.length - 1) continue;
+        else break;
+      }
+      var totalC = (typeof data.totalContributions === "number") ? data.totalContributions : total;
+      return { total: totalC, active: active, best: best, longest: longest, cur: cur };
+    }
+
+    function renderHeatmap(data) {
+      var cells = document.createDocumentFragment();
+      data.contributions.forEach(function (week) {
+        week.forEach(function (day) {
+          var lvl = LEVEL_MAP[day.contributionLevel] !== undefined ? LEVEL_MAP[day.contributionLevel] : 0;
+          var cell = document.createElement("span");
+          cell.className = "contrib__cell";
+          cell.setAttribute("data-level", lvl);
+          cell.setAttribute("title", (day.contributionCount || 0) + " contributions on " + day.date);
+          cells.appendChild(cell);
+        });
+      });
+      graph.innerHTML = "";
+      graph.appendChild(cells);
+    }
+
+    function sync(initial) {
+      if (el.syncWrap) el.syncWrap.classList.add("is-syncing");
+
+      fetch("https://github-contributions-api.deno.dev/" + GH_USER + ".json")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (!data || !data.contributions) return;
+          renderHeatmap(data);
+          var s = computeStats(data);
+          putStat(el.cur, s.cur);
+          putStat(el.longest, s.longest);
+          putStat(el.total, s.total);
+          putStat(el.active, s.active);
+          putStat(el.best, s.best);
+          hasAnimated = true;
+          if (el.sync) el.sync.textContent = fmtTime(new Date());
+        })
+        .catch(function (err) { console.error("GitHub signals sync failed:", err); })
+        .then(function () {
+          setTimeout(function () { if (el.syncWrap) el.syncWrap.classList.remove("is-syncing"); }, 600);
+        });
+
+      // Public repo count rarely changes — fetch once to conserve API limits.
+      if (initial) {
+        fetch("https://api.github.com/users/" + GH_USER)
+          .then(function (r) { return r.json(); })
+          .then(function (u) { if (u && typeof u.public_repos === "number") putStat(el.repos, u.public_repos); })
+          .catch(function () { /* leave repos at 0 */ });
       }
     }
 
-    // Fetch real GitHub contribution data
-    var username = "jvoclarit01";
-    fetch("https://github-contributions-api.deno.dev/" + username + ".json")
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (!data || !data.contributions) return;
-        
-        // Clear placeholder cells
-        graph.innerHTML = "";
-
-        // Authoritative total from GitHub; fall back to summing the
-        // daily counts so the number always reflects real activity.
-        var total = data.totalContributions;
-        if (typeof total !== "number") {
-          total = 0;
-          data.contributions.forEach(function (week) {
-            week.forEach(function (day) { total += (day.contributionCount || 0); });
-          });
-        }
-        var levelMap = {
-          'NONE': 0,
-          'FIRST_QUARTILE': 1,
-          'SECOND_QUARTILE': 2,
-          'THIRD_QUARTILE': 3,
-          'FOURTH_QUARTILE': 4
-        };
-
-        var cellFrag = document.createDocumentFragment();
-        data.contributions.forEach(function (week) {
-          week.forEach(function (day) {
-            var level = levelMap[day.contributionLevel] !== undefined ? levelMap[day.contributionLevel] : 0;
-            var cell = document.createElement("span");
-            cell.className = "contrib__cell";
-            cell.setAttribute("data-level", level);
-            cell.setAttribute("title", (day.contributionCount || 0) + " contributions on " + day.date);
-            cellFrag.appendChild(cell);
-          });
-        });
-        graph.appendChild(cellFrag);
-
-        // Update count with animation
-        if (countEl) {
-          countEl.textContent = "0";
-          if (reduceMotion || !("IntersectionObserver" in window)) {
-            animateCount(countEl, total);
-          } else {
-            var io = new IntersectionObserver(function (e) {
-              if (e[0].isIntersecting) { animateCount(countEl, total); io.disconnect(); }
-            }, { threshold: 0.4 });
-            io.observe(graph);
-          }
-        }
-      })
-      .catch(function (err) {
-        console.error("Failed to fetch GitHub contributions:", err);
-        // Honest fallback: keep the empty placeholder grid rather than
-        // fabricating activity. Count stays at 0 and we link out to GitHub.
-        if (countEl) countEl.textContent = "0";
-      });
+    // First sync when the panel scrolls into view (so counts animate up),
+    // then keep it live on an interval.
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      sync(true);
+    } else {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { sync(true); io.disconnect(); }
+      }, { threshold: 0.25 });
+      io.observe(graph);
+    }
+    setInterval(function () { sync(false); }, SYNC_INTERVAL);
   }
 
   // ---------- Discord presence (placeholder; Lanyard-ready) ----------
   // To go live: 1) join the Lanyard Discord (https://discord.gg/lanyard)
   //             2) put your Discord user ID below. Nothing else to change.
   var DISCORD_USER_ID = "615484398392967168"; // e.g. "123456789012345678"
+
+  var elapsedTimer = null;
 
   function applyPresence(data) {
     if (!data || !data.success || !data.data) return;
@@ -291,8 +332,11 @@
     var dot = document.getElementById("discordDot");
     var nameEl = document.getElementById("discordName");
     var stateEl = document.getElementById("discordState");
+    var handleEl = document.getElementById("discordHandle");
+
     if (dot) dot.className = "presence__dot presence__dot--" + status;
     if (nameEl && d.discord_user) nameEl.textContent = d.discord_user.global_name || d.discord_user.username;
+    if (handleEl && d.discord_user && d.discord_user.username) handleEl.textContent = "@" + d.discord_user.username;
 
     // Swap in the real Discord avatar when Lanyard provides one
     var avatarEl = document.getElementById("discordAvatar");
@@ -303,24 +347,152 @@
     var label = { online: "Online", idle: "Idle", dnd: "Do Not Disturb", offline: "Offline" }[status] || "Offline";
     if (stateEl) stateEl.textContent = label;
 
-    var act = (d.activities || []).filter(function (a) { return a.type !== 4; })[0]; // skip custom-status
+    // Custom status (activity type 4): emoji + text
+    var custom = (d.activities || []).filter(function (a) { return a.type === 4; })[0];
+    var customWrap = document.getElementById("discordCustom");
+    if (customWrap) {
+      var hasCustom = custom && (custom.state || (custom.emoji && custom.emoji.name));
+      customWrap.hidden = !hasCustom;
+      if (hasCustom) {
+        var emojiEl = document.getElementById("discordCustomEmoji");
+        if (emojiEl) {
+          if (custom.emoji && custom.emoji.id) {
+            var ce = custom.emoji.animated ? ".gif" : ".png";
+            emojiEl.innerHTML = '<img class="presence__custom-emoji-img" alt="" src="https://cdn.discordapp.com/emojis/' + custom.emoji.id + ce + '?size=24">';
+          } else {
+            emojiEl.textContent = (custom.emoji && custom.emoji.name) ? custom.emoji.name : "";
+          }
+        }
+        set("discordCustomText", custom.state || "");
+      }
+    }
+
+    // Platform footer
+    var platforms = [];
+    if (d.active_on_discord_desktop) platforms.push("Desktop");
+    if (d.active_on_discord_mobile) platforms.push("Mobile");
+    if (d.active_on_discord_web) platforms.push("Web");
+    var footEl = document.getElementById("discordFoot");
+    if (footEl) {
+      if (status === "offline") { set("discordPlatform", "Currently offline"); footEl.hidden = false; }
+      else if (platforms.length) { set("discordPlatform", "Active on " + platforms.join(" + ")); footEl.hidden = false; }
+      else { footEl.hidden = true; }
+    }
+
+    // Spotify is shown in its own "Now Playing" card below
+    applySpotify(d);
+
+    // Primary Discord activity — first real activity (skip custom status + Spotify)
+    if (elapsedTimer) { clearInterval(elapsedTimer); elapsedTimer = null; }
     var block = document.getElementById("discordActivity");
-    if (!act) { if (block) block.style.display = "none"; return; }
+    var imgEl = document.getElementById("discordActImg");
+    var glyphEl = document.getElementById("discordActGlyph");
     if (block) block.style.display = "";
+    if (imgEl) imgEl.hidden = true;
+    if (glyphEl) glyphEl.style.display = "";
+
+    var act = (d.activities || []).filter(function (a) {
+      return a.type !== 4 && !(a.type === 2 && (a.name === "Spotify" || a.id === "spotify:1"));
+    })[0];
+    if (!act) {
+      set("discordActLabel", "Status");
+      set("discordActTitle", status === "offline" ? "Offline" : "No activity right now");
+      set("discordActDetail", status === "offline" ? "Catch me another time" : "Probably building something ✨");
+      set("discordActState", "");
+      set("discordActElapsed", "");
+      return;
+    }
     var t = { 0: "Playing", 1: "Streaming", 2: "Listening to", 3: "Watching" }[act.type] || "Doing";
     set("discordActLabel", t);
     set("discordActTitle", act.name || "");
     set("discordActDetail", act.details || "");
     set("discordActState", act.state || "");
+    if (act.timestamps && act.timestamps.start) startElapsed(act.timestamps.start, act.timestamps.end);
+    else set("discordActElapsed", "");
   }
   function set(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; }
 
+  // Live-ticking elapsed clock for the current activity / Spotify track
+  function startElapsed(start, end) {
+    var el = document.getElementById("discordActElapsed");
+    if (!el) return;
+    function pad(n) { return n < 10 ? "0" + n : "" + n; }
+    function fmt(ms) {
+      if (ms < 0) ms = 0;
+      var s = Math.floor(ms / 1000), h = Math.floor(s / 3600); s -= h * 3600;
+      var m = Math.floor(s / 60); s -= m * 60;
+      return (h > 0 ? h + ":" + pad(m) : "" + m) + ":" + pad(s);
+    }
+    function tick() {
+      var now = Date.now();
+      el.textContent = end ? (fmt(now - start) + " / " + fmt(end - start)) : (fmt(now - start) + " elapsed");
+    }
+    tick();
+    elapsedTimer = setInterval(tick, 1000);
+  }
+
+  // ---------- Spotify "Now Playing" (from the same Lanyard payload) ----------
+  var spotifyTimer = null;
+  function applySpotify(d) {
+    var card = document.getElementById("spotifyCard");
+    if (!card) return;
+    var body = document.getElementById("spotifyBody");
+    var prog = document.getElementById("spotifyProgress");
+    var idle = document.getElementById("spotifyIdle");
+    if (spotifyTimer) { clearInterval(spotifyTimer); spotifyTimer = null; }
+
+    if (!(d.listening_to_spotify && d.spotify)) {
+      card.classList.remove("is-playing");
+      if (body) body.hidden = true;
+      if (prog) prog.hidden = true;
+      if (idle) idle.hidden = false;
+      return;
+    }
+
+    var sp = d.spotify;
+    card.classList.add("is-playing");
+    if (idle) idle.hidden = true;
+    if (body) {
+      body.hidden = false;
+      if (sp.track_id) body.href = "https://open.spotify.com/track/" + sp.track_id;
+    }
+    var art = document.getElementById("spotifyArt");
+    if (art && sp.album_art_url) art.src = sp.album_art_url;
+    set("spotifySong", sp.song || "");
+    set("spotifyArtist", sp.artist || "");
+    set("spotifyAlbum", sp.album || "");
+
+    var ts = sp.timestamps || {};
+    if (prog && ts.start && ts.end) {
+      prog.hidden = false;
+      var fill = document.getElementById("spotifyBarFill");
+      var curEl = document.getElementById("spotifyCur");
+      var durEl = document.getElementById("spotifyDur");
+      function mmss(ms) { if (ms < 0) ms = 0; var s = Math.floor(ms / 1000), m = Math.floor(s / 60); s -= m * 60; return m + ":" + (s < 10 ? "0" + s : s); }
+      function step() {
+        var dur = ts.end - ts.start;
+        var pos = Math.min(Math.max(Date.now() - ts.start, 0), dur);
+        if (fill) fill.style.width = (dur > 0 ? (pos / dur * 100) : 0) + "%";
+        if (curEl) curEl.textContent = mmss(pos);
+        if (durEl) durEl.textContent = mmss(dur);
+      }
+      step();
+      spotifyTimer = setInterval(step, 1000);
+    } else if (prog) {
+      prog.hidden = true;
+    }
+  }
+
   function initPresence() {
     if (!DISCORD_USER_ID) return; // keep placeholder markup until an ID is set
-    fetch("https://api.lanyard.rest/v1/users/" + DISCORD_USER_ID)
-      .then(function (r) { return r.json(); })
-      .then(applyPresence)
-      .catch(function () { /* stay on placeholder */ });
+    function poll() {
+      fetch("https://api.lanyard.rest/v1/users/" + DISCORD_USER_ID)
+        .then(function (r) { return r.json(); })
+        .then(applyPresence)
+        .catch(function () { /* keep last good state */ });
+    }
+    poll();
+    setInterval(poll, 30000); // keep presence live
   }
 
   // ---------- project thumb tilt ----------
@@ -534,7 +706,7 @@
   // ---------- boot ----------
   function init() {
     buildSplits();
-    initContrib();
+    initGitHubSignals();
     initPresence();
     initTilt();
     initShots();

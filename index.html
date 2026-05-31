@@ -248,12 +248,14 @@
       <div class="connect-section__inner">
         
         <header class="connect-section__head" data-reveal>
-          <span class="connect-section__eyebrow">Let's Connect</span>
-          <h2 class="connect-section__heading">Digital Presence</h2>
-          <p class="connect-section__lead">Find me on Discord or track my open-source contributions on GitHub. Let's build our network.</p>
+          <span class="connect-section__eyebrow">Real-Time</span>
+          <h2 class="connect-section__heading">Live Signals</h2>
+          <p class="connect-section__lead">A live pulse of what I'm up to right now — my Discord presence, what I'm listening to on Spotify, and my GitHub activity, all synced straight from the source.</p>
         </header>
 
         <div class="connect-section__grid">
+          <!-- Left column: Discord presence + Spotify now-playing -->
+          <div class="connect-col">
           <!-- Discord card -->
           <article class="presence" data-reveal>
             <header class="presence__top">
@@ -263,8 +265,11 @@
                 <span class="presence__dot presence__dot--online" id="discordDot"></span>
               </div>
               <div class="presence__id">
-                <h3 class="presence__name" id="discordName">Bruno</h3>
-                <p class="presence__state" id="discordState" aria-live="polite">Online</p>
+                <h3 class="presence__name" id="discordName">jv_lovesyou</h3>
+                <p class="presence__state" aria-live="polite">
+                  <span id="discordState">Online</span>
+                  <span class="presence__handle" id="discordHandle">@jv6911</span>
+                </p>
               </div>
               <a href="https://discord.com/users/615484398392967168" target="_blank" rel="noopener noreferrer" class="presence__brand-link" aria-label="Discord Profile">
                 <svg class="presence__brand" viewBox="0 0 24 24" aria-hidden="true">
@@ -272,38 +277,110 @@
                 </svg>
               </a>
             </header>
+            <!-- custom status (auto-shows when set) -->
+            <p class="presence__custom" id="discordCustom" hidden>
+              <span class="presence__custom-emoji" id="discordCustomEmoji" aria-hidden="true"></span>
+              <span id="discordCustomText"></span>
+            </p>
+
             <div class="presence__activity" id="discordActivity">
-              <div class="presence__art" aria-hidden="true"><span>&#9658;</span></div>
-              <div class="presence__act-body">
-                <span class="presence__act-label" id="discordActLabel">Playing a game</span>
-                <span class="presence__act-title" id="discordActTitle">[ Activity name ]</span>
-                <span class="presence__act-detail" id="discordActDetail">[ What you&rsquo;re doing ]</span>
-                <span class="presence__act-state" id="discordActState">[ Status detail ]</span>
+              <div class="presence__art" aria-hidden="true">
+                <img class="presence__art-img" id="discordActImg" alt="" hidden />
+                <span class="presence__art-glyph" id="discordActGlyph">&#9658;</span>
               </div>
+              <div class="presence__act-body">
+                <span class="presence__act-label" id="discordActLabel">Playing</span>
+                <span class="presence__act-title" id="discordActTitle">&mdash;</span>
+                <span class="presence__act-detail" id="discordActDetail"></span>
+                <span class="presence__act-state" id="discordActState"></span>
+                <span class="presence__act-elapsed" id="discordActElapsed"></span>
+              </div>
+            </div>
+
+            <div class="presence__foot" id="discordFoot" hidden>
+              <span class="presence__platform" id="discordPlatform"></span>
             </div>
           </article>
 
-          <!-- GitHub contribution card -->
-          <article class="contrib" data-reveal>
-            <header class="contrib__top">
-              <div class="contrib__avatar">
-                <img id="ghAvatar" src="https://github.com/jvoclarit01.png?size=160" alt="jvoclarit01 GitHub avatar" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='images/profile.png';" />
-              </div>
-              <div class="contrib__id">
-                <h3 class="contrib__name" id="ghName">jvoclarit01</h3>
-                <p class="contrib__sub"><span id="ghCount">0</span> contributions in the last year</p>
-              </div>
-              <a href="https://github.com/jvoclarit01" target="_blank" rel="noopener noreferrer" class="contrib__brand-link" aria-label="GitHub Profile">
-                <svg class="contrib__brand" viewBox="0 0 24 24" aria-hidden="true">
-                  <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-                </svg>
-              </a>
+          <!-- Spotify now-playing (via Lanyard) -->
+          <article class="nowplaying" id="spotifyCard" data-reveal>
+            <header class="nowplaying__head">
+              <span class="nowplaying__label">
+                <svg class="nowplaying__brand" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0m5.52 17.34c-.24.36-.66.48-1.02.24-2.82-1.74-6.36-2.1-10.56-1.14-.42.12-.78-.18-.9-.54-.12-.42.18-.78.54-.9 4.56-1.02 8.52-.6 11.64 1.32.42.18.48.66.3 1.02m1.44-3.3c-.3.42-.84.6-1.26.3-3.24-1.98-8.16-2.58-11.94-1.38-.48.12-1.02-.12-1.14-.6-.12-.48.12-1.02.6-1.14 4.38-1.32 9.78-.66 13.5 1.62.36.18.54.78.24 1.2m.12-3.36C16.2 8.4 9.96 8.16 6.36 9.3c-.6.18-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.2-1.26 11.04-1.02 15.36 1.56.54.3.72 1.02.42 1.56-.3.48-1.02.66-1.56.36"/></svg>
+                Now Playing
+              </span>
+              <span class="nowplaying__tag" id="spotifyTag">Spotify</span>
             </header>
-            <div class="contrib__graph" id="contribGraph" role="img" aria-label="GitHub contribution graph"></div>
-            <footer class="contrib__legend">
-              <span>Less</span>
-              <span class="contrib__legend-cells" id="contribLegend" aria-hidden="true"></span>
-              <span>More</span>
+
+            <a class="nowplaying__body" id="spotifyBody" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer" hidden>
+              <div class="nowplaying__art">
+                <img id="spotifyArt" alt="Album art" />
+                <span class="nowplaying__eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+              </div>
+              <div class="nowplaying__meta">
+                <span class="nowplaying__song" id="spotifySong">&mdash;</span>
+                <span class="nowplaying__artist" id="spotifyArtist"></span>
+                <span class="nowplaying__album" id="spotifyAlbum"></span>
+              </div>
+            </a>
+
+            <div class="nowplaying__progress" id="spotifyProgress" hidden>
+              <div class="nowplaying__bar"><span class="nowplaying__bar-fill" id="spotifyBarFill"></span></div>
+              <div class="nowplaying__times"><span id="spotifyCur">0:00</span><span id="spotifyDur">0:00</span></div>
+            </div>
+
+            <p class="nowplaying__idle" id="spotifyIdle">Not playing anything right now.</p>
+          </article>
+          </div><!-- /connect-col -->
+
+          <!-- GitHub Activity — live signals -->
+          <article class="contrib signals" data-reveal>
+            <header class="signals__head">
+              <div class="signals__head-id">
+                <h3 class="signals__title">GitHub Activity</h3>
+                <span class="signals__sub">Last 12 Months</span>
+              </div>
+              <div class="signals__meta">
+                <span class="signals__live"><span class="signals__live-dot"></span>Live</span>
+                <span class="signals__sync" id="ghSyncWrap">Sync: <span id="ghSync">--:--</span></span>
+              </div>
+            </header>
+
+            <div class="signals__stats">
+              <div class="signals__stat">
+                <span class="signals__stat-label">Current Streak</span>
+                <span class="signals__stat-val"><span id="statCurStreak">0</span><small>d</small></span>
+              </div>
+              <div class="signals__stat">
+                <span class="signals__stat-label">Longest Streak</span>
+                <span class="signals__stat-val"><span id="statLongStreak">0</span><small>d</small></span>
+              </div>
+              <div class="signals__stat">
+                <span class="signals__stat-label">Total Contributions</span>
+                <span class="signals__stat-val signals__stat-val--accent" id="statTotal">0</span>
+              </div>
+              <div class="signals__stat">
+                <span class="signals__stat-label">Active Days</span>
+                <span class="signals__stat-val" id="statActive">0</span>
+              </div>
+              <div class="signals__stat">
+                <span class="signals__stat-label">Best Day</span>
+                <span class="signals__stat-val" id="statBest">0</span>
+              </div>
+              <div class="signals__stat">
+                <span class="signals__stat-label">Public Repos</span>
+                <span class="signals__stat-val" id="statRepos">0</span>
+              </div>
+            </div>
+
+            <div class="signals__heatmap">
+              <span class="signals__heatmap-label">52-Week Heatmap</span>
+              <div class="contrib__graph" id="contribGraph" role="img" aria-label="GitHub contribution graph"></div>
+            </div>
+
+            <footer class="signals__foot">
+              <span class="signals__foot-note">Public activity</span>
+              <a href="https://github.com/jvoclarit01" target="_blank" rel="noopener noreferrer" class="signals__details">View Details &#8594;</a>
             </footer>
           </article>
         </div>
@@ -385,6 +462,7 @@
       <div class="footer__social">
         <a href="https://github.com/jvoclarit01" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GitHub</a>
         <a href="https://www.linkedin.com/in/jan-vincent-oclarit" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LinkedIn</a>
+        <a href="https://www.upwork.com/freelancers/~0172cc238394e62987?mp_source=share" aria-label="Upwork">Upwork</a>
         <a href="mailto:janvincentoclarit01@gmail.com" aria-label="Email">Email</a>
       </div>
     </div>
