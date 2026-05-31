@@ -480,6 +480,15 @@ a:hover .cw__inner, a:focus-visible .cw__inner { transform: translateY(-100%); }
 .footer { padding-block: 40px; border-top: 1px solid var(--border); margin-top: 40px; }
 .footer__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
 .footer__copy { display: flex; flex-direction: column; font-size: .85rem; color: var(--muted); }
+.footer__brand-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  background-image: linear-gradient(100deg, var(--blue), var(--accent), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.35));
+}
 .footer__nav { display: flex; gap: 18px; }
 .footer__nav a, .footer__social a { position: relative; overflow: hidden; display: inline-flex; font-size: .9rem; color: var(--muted); transition: color .5s var(--ease); }
 .footer__nav a:hover, .footer__social a:hover { color: var(--text); }
