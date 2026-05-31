@@ -189,29 +189,27 @@
     requestAnimationFrame(step);
   }
 
-  // ---------- GitHub contribution graph (placeholder) ----------
+  // ---------- GitHub contribution graph ----------
   function initContrib() {
     var graph = document.getElementById("contribGraph");
     var legend = document.getElementById("contribLegend");
     var countEl = document.getElementById("ghCount");
     if (!graph) return;
 
-    var WEEKS = 52, total = 0;
+    // Generate placeholder grid immediately for loading state
+    var WEEKS = 52;
     var frag = document.createDocumentFragment();
     for (var w = 0; w < WEEKS; w++) {
       for (var d = 0; d < 7; d++) {
-        var r = Math.random();
-        var level = r < 0.5 ? 0 : r < 0.72 ? 1 : r < 0.88 ? 2 : r < 0.96 ? 3 : 4;
         var cell = document.createElement("span");
         cell.className = "contrib__cell";
-        cell.setAttribute("data-level", level);
-        total += level * 3; // rough placeholder contribution tally
+        cell.setAttribute("data-level", 0);
         frag.appendChild(cell);
       }
     }
     graph.appendChild(frag);
 
-    if (legend) {
+    if (legend && legend.children.length === 0) {
       for (var l = 0; l <= 4; l++) {
         var c = document.createElement("span");
         c.className = "contrib__cell";
@@ -219,16 +217,66 @@
         legend.appendChild(c);
       }
     }
-    if (countEl) {
-      if (reduceMotion || !("IntersectionObserver" in window)) {
-        animateCount(countEl, total);
-      } else {
-        var io = new IntersectionObserver(function (e) {
-          if (e[0].isIntersecting) { animateCount(countEl, total); io.disconnect(); }
-        }, { threshold: 0.4 });
-        io.observe(graph);
-      }
-    }
+
+    // Fetch real GitHub contribution data
+    var username = "jvoclarit01";
+    fetch("https://github-contributions-api.deno.dev/" + username + ".json")
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data || !data.contributions) return;
+        
+        // Clear placeholder cells
+        graph.innerHTML = "";
+
+        // Authoritative total from GitHub; fall back to summing the
+        // daily counts so the number always reflects real activity.
+        var total = data.totalContributions;
+        if (typeof total !== "number") {
+          total = 0;
+          data.contributions.forEach(function (week) {
+            week.forEach(function (day) { total += (day.contributionCount || 0); });
+          });
+        }
+        var levelMap = {
+          'NONE': 0,
+          'FIRST_QUARTILE': 1,
+          'SECOND_QUARTILE': 2,
+          'THIRD_QUARTILE': 3,
+          'FOURTH_QUARTILE': 4
+        };
+
+        var cellFrag = document.createDocumentFragment();
+        data.contributions.forEach(function (week) {
+          week.forEach(function (day) {
+            var level = levelMap[day.contributionLevel] !== undefined ? levelMap[day.contributionLevel] : 0;
+            var cell = document.createElement("span");
+            cell.className = "contrib__cell";
+            cell.setAttribute("data-level", level);
+            cell.setAttribute("title", (day.contributionCount || 0) + " contributions on " + day.date);
+            cellFrag.appendChild(cell);
+          });
+        });
+        graph.appendChild(cellFrag);
+
+        // Update count with animation
+        if (countEl) {
+          countEl.textContent = "0";
+          if (reduceMotion || !("IntersectionObserver" in window)) {
+            animateCount(countEl, total);
+          } else {
+            var io = new IntersectionObserver(function (e) {
+              if (e[0].isIntersecting) { animateCount(countEl, total); io.disconnect(); }
+            }, { threshold: 0.4 });
+            io.observe(graph);
+          }
+        }
+      })
+      .catch(function (err) {
+        console.error("Failed to fetch GitHub contributions:", err);
+        // Honest fallback: keep the empty placeholder grid rather than
+        // fabricating activity. Count stays at 0 and we link out to GitHub.
+        if (countEl) countEl.textContent = "0";
+      });
   }
 
   // ---------- Discord presence (placeholder; Lanyard-ready) ----------
@@ -245,6 +293,13 @@
     var stateEl = document.getElementById("discordState");
     if (dot) dot.className = "presence__dot presence__dot--" + status;
     if (nameEl && d.discord_user) nameEl.textContent = d.discord_user.global_name || d.discord_user.username;
+
+    // Swap in the real Discord avatar when Lanyard provides one
+    var avatarEl = document.getElementById("discordAvatar");
+    if (avatarEl && d.discord_user && d.discord_user.avatar) {
+      var ext = d.discord_user.avatar.indexOf("a_") === 0 ? ".gif" : ".png";
+      avatarEl.src = "https://cdn.discordapp.com/avatars/" + d.discord_user.id + "/" + d.discord_user.avatar + ext + "?size=128";
+    }
     var label = { online: "Online", idle: "Idle", dnd: "Do Not Disturb", offline: "Offline" }[status] || "Offline";
     if (stateEl) stateEl.textContent = label;
 
@@ -279,6 +334,29 @@
         el.style.transform = "perspective(700px) rotateX(" + rx + "deg) rotateY(" + ry + "deg)";
       });
       el.addEventListener("pointerleave", function () { el.style.transform = ""; });
+    });
+  }
+
+  // ---------- screenshot hover-scrub ----------
+  // Move the cursor up/down a project screenshot to scrub through the
+  // full page; leaving resumes the slow auto-pan.
+  function initShots() {
+    if (isTouch) return; // pointer devices only; touch keeps the auto-pan
+    document.querySelectorAll("[data-shot]").forEach(function (frame) {
+      var img = frame.querySelector(".browser-frame__shot");
+      var screen = frame.querySelector(".browser-frame__screen");
+      if (!img || !screen) return;
+      frame.addEventListener("pointermove", function (e) {
+        var r = screen.getBoundingClientRect();
+        var p = (e.clientY - r.top) / r.height;
+        p = Math.max(0, Math.min(1, p));
+        frame.classList.add("is-scrubbing");
+        img.style.objectPosition = "center " + (p * 100) + "%";
+      });
+      frame.addEventListener("pointerleave", function () {
+        frame.classList.remove("is-scrubbing");
+        img.style.objectPosition = "";
+      });
     });
   }
 
@@ -459,6 +537,7 @@
     initContrib();
     initPresence();
     initTilt();
+    initShots();
     initProjectsScroll();
     initProfileFade();
     initContactForm();
