@@ -14,5 +14,5 @@ node_modules/
 *.mp4
 *.webm
 frames/
-dala-frames/
+render-frames/
 
