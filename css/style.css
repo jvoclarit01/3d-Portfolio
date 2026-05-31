@@ -159,10 +159,25 @@ main, .header, .footer { position: relative; z-index: 1; }
 /* ============================================================
    HEADER + NAV
    ============================================================ */
-.header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding-block: 18px; }
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding-block: 18px;
+  transition: padding-block .3s var(--ease);
+}
 .header::before {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: linear-gradient(180deg, rgba(6,6,15,.92), rgba(6,6,15,.5) 60%, transparent);
+  transition: background .3s var(--ease), backdrop-filter .3s var(--ease), border-color .3s var(--ease);
+  border-bottom: 1px solid transparent;
+}
+.header.is-scrolled {
+  padding-block: 12px;
+}
+.header.is-scrolled::before {
+  background: rgba(6, 6, 12, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: rgba(0, 243, 255, 0.15);
 }
 .header__inner { display: flex; align-items: center; justify-content: space-between; }
 

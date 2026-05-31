@@ -703,6 +703,25 @@
     }, 2200);
   }
 
+  // ---------- header background scroll effect ----------
+  function initHeaderScroll() {
+    var header = document.querySelector(".header");
+    if (!header) return;
+    var ticking = false;
+    function update() {
+      if (window.scrollY > 50) {
+        header.classList.add("is-scrolled");
+      } else {
+        header.classList.remove("is-scrolled");
+      }
+      ticking = false;
+    }
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
+
   // ---------- boot ----------
   function init() {
     buildSplits();
@@ -716,6 +735,7 @@
     initScrollProgress();
     initScrollSpy();
     initRoleRotate();
+    initHeaderScroll();
     runLoader(function () {
       revealHero();
       startReveals();
