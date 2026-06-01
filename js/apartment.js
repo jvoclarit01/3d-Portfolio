@@ -93,66 +93,86 @@ const ZONE_X = [-13, -8, -2.5, 3.5, 12];
 //  procedural textures (oak wood, white marble, cream bouclé)
 // ============================================================
 
-function makeOakTexture() {
+function makeGridTexture() {
   const cv = document.createElement("canvas");
   cv.width = 256; cv.height = 256;
   const ctx = cv.getContext("2d");
-  ctx.fillStyle = "#cca37a"; ctx.fillRect(0, 0, 256, 256);
-  ctx.strokeStyle = "#b48e65"; ctx.lineWidth = 1.5;
-  for (let i = 0; i < 30; i++) {
-    const y = Math.random() * 256;
-    ctx.beginPath(); ctx.moveTo(0, y);
-    for (let x = 0; x <= 256; x += 32) {
-      ctx.lineTo(x, y + Math.sin(x / 30 + y) * 3);
-    }
-    ctx.stroke();
+  // Dark carbon background
+  ctx.fillStyle = "#0d0f12";
+  ctx.fillRect(0, 0, 256, 256);
+  // Grid lines
+  ctx.strokeStyle = "rgba(0, 243, 255, 0.15)";
+  ctx.lineWidth = 1;
+  const step = 32;
+  for (let x = 0; x < 256; x += step) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 256); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, x); ctx.lineTo(256, x); ctx.stroke();
   }
-  const tex = new THREE.CanvasTexture(cv);
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.RepeatWrapping;
-  return tex;
-}
-
-function makeMarbleTexture() {
-  const cv = document.createElement("canvas");
-  cv.width = 256; cv.height = 256;
-  const ctx = cv.getContext("2d");
-  ctx.fillStyle = "#faf9f6"; ctx.fillRect(0, 0, 256, 256);
+  // Neon cyan borders/highlights
+  ctx.strokeStyle = "#00f3ff";
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(0, 0, 256, 256);
   
-  ctx.strokeStyle = "rgba(100, 100, 110, 0.15)"; ctx.lineWidth = 2;
-  for (let i = 0; i < 6; i++) {
-    ctx.beginPath();
-    let cx = Math.random() * 256, cy = 0;
-    ctx.moveTo(cx, cy);
-    while (cy < 256) {
-      cx += (Math.random() - 0.5) * 30; cy += 20 + Math.random() * 20;
-      ctx.lineTo(cx, cy);
-    }
-    ctx.stroke();
-  }
-  const tex = new THREE.CanvasTexture(cv);
-  return tex;
-}
-
-function makeBoucleTexture() {
-  const cv = document.createElement("canvas");
-  cv.width = 64; cv.height = 64;
-  const ctx = cv.getContext("2d");
-  ctx.fillStyle = "#f5f3ef"; ctx.fillRect(0, 0, 64, 64);
-  for (let i = 0; i < 800; i++) {
-    ctx.fillStyle = Math.random() > 0.5 ? "rgba(200, 195, 185, 0.2)" : "rgba(255, 255, 255, 0.5)";
-    ctx.fillRect(Math.random() * 64, Math.random() * 64, 1.2, 1.2);
-  }
   const tex = new THREE.CanvasTexture(cv);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(8, 8);
   return tex;
 }
 
-const texOak = makeOakTexture();
-const texMarble = makeMarbleTexture();
-const texBoucle = makeBoucleTexture();
+function makeCircuitTexture() {
+  const cv = document.createElement("canvas");
+  cv.width = 256; cv.height = 256;
+  const ctx = cv.getContext("2d");
+  // Dark slate background
+  ctx.fillStyle = "#14151b";
+  ctx.fillRect(0, 0, 256, 256);
+  
+  // Draw circuit lines (hot pink pathways)
+  ctx.strokeStyle = "#ff007f";
+  ctx.lineWidth = 1.5;
+  
+  const pathways = [
+    [[16, 16], [80, 16], [112, 48], [112, 128]],
+    [[112, 48], [208, 48], [224, 64]],
+    [[32, 192], [96, 192], [128, 224], [224, 224]],
+    [[80, 96], [80, 128], [32, 176]],
+    [[176, 112], [176, 176], [192, 192], [192, 240]]
+  ];
+  
+  pathways.forEach(p => {
+    ctx.beginPath();
+    ctx.moveTo(p[0][0], p[0][1]);
+    for (let i = 1; i < p.length; i++) {
+      ctx.lineTo(p[i][0], p[i][1]);
+    }
+    ctx.stroke();
+  });
+  
+  // Draw cyan points/nodes
+  ctx.fillStyle = "#00f3ff";
+  const points = [
+    [16, 16], [112, 128], [224, 64], [32, 176], [224, 224], [80, 96], [192, 240], [176, 112]
+  ];
+  points.forEach(pt => {
+    ctx.beginPath();
+    ctx.arc(pt[0], pt[1], 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    // Glow
+    ctx.fillStyle = "rgba(0, 243, 255, 0.35)";
+    ctx.beginPath();
+    ctx.arc(pt[0], pt[1], 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#00f3ff";
+  });
+  
+  const tex = new THREE.CanvasTexture(cv);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  return tex;
+}
+
+const texGrid = makeGridTexture();
+const texCircuit = makeCircuitTexture();
 
 // ============================================================
 //  geometry helpers
@@ -188,28 +208,34 @@ function makeLabel(lines, opt = {}) {
   const pad = 24, lh = 64, fs = opt.fs || 42;
   const cv = document.createElement("canvas");
   const ctx = cv.getContext("2d");
-  ctx.font = `500 ${fs}px 'Inter', sans-serif`;
+  const fontFam = opt.font || "'Inter', sans-serif";
+  ctx.font = `500 ${fs}px ${fontFam}`;
   let w = 0;
   lines.forEach((l) => { w = Math.max(w, ctx.measureText(l).width); });
   cv.width = Math.ceil(w + pad * 2);
   cv.height = Math.ceil(lines.length * lh + pad * 2);
   
   const c2 = cv.getContext("2d");
-  c2.font = `500 ${fs}px 'Inter', sans-serif`;
+  c2.font = `500 ${fs}px ${fontFam}`;
   c2.textBaseline = "middle";
   
   const textColor = opt.color || "#202022";
   
-  if (opt.isWood) {
-    c2.fillStyle = "#cca37a"; c2.fillRect(0, 0, cv.width, cv.height);
-    c2.strokeStyle = "#b48e65"; c2.lineWidth = 1;
-    for (let i = 0; i < 15; i++) {
-      const y = Math.random() * cv.height;
-      c2.beginPath(); c2.moveTo(0, y); c2.lineTo(cv.width, y); c2.stroke();
+  if (opt.isCarbon) {
+    // Dark carbon background
+    c2.fillStyle = "#12131c"; c2.fillRect(0, 0, cv.width, cv.height);
+    // Draw subtle grid
+    c2.strokeStyle = "rgba(0, 243, 255, 0.1)"; c2.lineWidth = 1;
+    for (let gx = 0; gx < cv.width; gx += 20) {
+      c2.beginPath(); c2.moveTo(gx, 0); c2.lineTo(gx, cv.height); c2.stroke();
     }
-  }
-
-  if (opt.box && !opt.isWood) {
+    for (let gy = 0; gy < cv.height; gy += 20) {
+      c2.beginPath(); c2.moveTo(0, gy); c2.lineTo(cv.width, gy); c2.stroke();
+    }
+    // Glowing neon border
+    c2.strokeStyle = textColor; c2.lineWidth = 3;
+    c2.strokeRect(4, 4, cv.width - 8, cv.height - 8);
+  } else if (opt.box) {
     c2.strokeStyle = textColor; c2.lineWidth = 2;
     c2.strokeRect(6, 6, cv.width - 12, cv.height - 12);
   }
@@ -236,17 +262,17 @@ scene.add(apt);
 // ============================================================
 (function shell() {
   // Stepped platforms
-  apt.add(box(7.5, 0.4, 13, std(C.floor, { map: texOak }), -13.25, 0.2, 0.3)); // Foyer/Kitchen
-  apt.add(box(6.5, 0.4, 13, std(C.floor, { map: texOak }), -2.75, 0.2, 0.3));  // Workspace
-  apt.add(box(7.0, 0.4, 13, std(C.floor, { map: texOak }), 4.0, 0.2, 0.3));   // Gallery
+  apt.add(box(7.5, 0.4, 13, std(C.floor, { map: texGrid }), -13.25, 0.2, 0.3)); // Foyer/Kitchen
+  apt.add(box(6.5, 0.4, 13, std(C.floor, { map: texGrid }), -2.75, 0.2, 0.3));  // Workspace
+  apt.add(box(7.0, 0.4, 13, std(C.floor, { map: texGrid }), 4.0, 0.2, 0.3));   // Gallery
   apt.add(box(9.5, 0.4, 13, std(0xdcdad5, { rough: 0.7 }), 12.25, 0.2, 0.3)); // Terrace (Concrete)
   
   // Sunken Lounge segment
-  apt.add(box(3.5, 0.1, 13, std(C.floor, { map: texOak }), -7.75, 0.05, 0.3));
+  apt.add(box(3.5, 0.1, 13, std(C.floor, { map: texGrid }), -7.75, 0.05, 0.3));
   
-  // Oak steps details
-  apt.add(box(0.3, 0.2, 13, std(C.wood, { map: texOak }), -9.65, 0.2, 0.3));
-  apt.add(box(0.3, 0.2, 13, std(C.wood, { map: texOak }), -5.85, 0.2, 0.3));
+  // Steps details
+  apt.add(box(0.3, 0.2, 13, std(C.wood, { map: texGrid }), -9.65, 0.2, 0.3));
+  apt.add(box(0.3, 0.2, 13, std(C.wood, { map: texGrid }), -5.85, 0.2, 0.3));
 
   // Holographic layout grids (Low opacity warm oak)
   const gridColor = new THREE.Color(C.wood);
@@ -268,16 +294,16 @@ scene.add(apt);
   apt.add(box(40, 7.2, 0.3, std(C.wall), 0, 3.6, -6.2));
   apt.add(box(0.3, 7.2, 13, std(C.wallHi), -17, 3.6, 0.3));
 
-  // Glowing baseboard LED strips (warm oak light)
+  // Glowing baseboard LED strips
   apt.add(box(40, 0.03, 0.03, new THREE.MeshStandardMaterial({ color: 0x050505, emissive: C.wood, emissiveIntensity: 1.8 }), 0, 0.52, -6.0));
 
-  // Wood baseboards
-  apt.add(box(40, 0.2, 0.08, std(C.wood, { map: texOak }), 0, 0.5, -6.05));
-  apt.add(box(3.5, 0.2, 0.08, std(C.wood, { map: texOak }), -7.75, 0.2, -6.05));
+  // Baseboards (dark metal)
+  apt.add(box(40, 0.2, 0.08, std(C.charcoal, { metal: 0.8, rough: 0.2 }), 0, 0.5, -6.05));
+  apt.add(box(3.5, 0.2, 0.08, std(C.charcoal, { metal: 0.8, rough: 0.2 }), -7.75, 0.2, -6.05));
 
-  // Ceiling Beams
+  // Ceiling Beams (dark metal)
   for (let cx = -16; cx <= 16; cx += 4) {
-    apt.add(box(0.3, 0.4, 13, std(C.wood, { map: texOak }), cx, 6.8, 0.3));
+    apt.add(box(0.3, 0.4, 13, std(C.charcoal, { metal: 0.8, rough: 0.2 }), cx, 6.8, 0.3));
   }
   
   // Ceiling LED glow strip
@@ -287,13 +313,14 @@ scene.add(apt);
   const lampX = [-13, -8, -2.5, 3.5];
   lampX.forEach(x => {
     apt.add(place(cyl(0.012, 0.012, 2.0, std(C.charcoal)), x, 5.8, -1.5));
-    apt.add(place(cyl(0.24, 0.08, 0.32, std(C.wood, { map: texOak }), 12), x, 4.8, -1.5));
+    apt.add(place(cyl(0.24, 0.08, 0.32, std(C.wood, { map: texGrid }), 12), x, 4.8, -1.5));
     
-    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfff3e5 }));
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), new THREE.MeshBasicMaterial({ color: 0x00f3ff }));
     bulb.position.set(x, 4.62, -1.5);
     apt.add(bulb);
     
-    const pl = new THREE.PointLight(0xfff0dd, 0.6, 8, 1.8);
+    // Increased intensity and range to match neon values
+    const pl = new THREE.PointLight(0x00f3ff, 1.8, 12, 1.2);
     pl.position.set(x, 4.4, -1.5);
     scene.add(pl);
   });
@@ -304,33 +331,38 @@ scene.add(apt);
 // ============================================================
 (function foyer() {
   const x = -13;
-  // Entrance door frame and panels
-  apt.add(box(0.1, 4.4, 2.6, std(C.charcoal), -16.9, 2.6, 0.3));
-  apt.add(box(0.18, 4.6, 0.14, std(C.wood, { map: texOak }), -16.82, 2.6, -1.0));
-  apt.add(box(0.18, 4.6, 0.14, std(C.wood, { map: texOak }), -16.82, 2.6, 1.6));
-  apt.add(box(0.18, 0.14, 2.7, std(C.wood, { map: texOak }), -16.82, 4.9, 0.3));
+  // Entrance door frame and panels (metallic cyber sliding door frame & glowing border lines)
+  apt.add(box(0.1, 4.4, 2.6, std(C.charcoal, { metal: 0.9, rough: 0.15 }), -16.9, 2.6, 0.3));
+  apt.add(box(0.18, 4.6, 0.14, std(C.charcoal, { metal: 0.8, rough: 0.2 }), -16.82, 2.6, -1.0));
+  apt.add(box(0.18, 4.6, 0.14, std(C.charcoal, { metal: 0.8, rough: 0.2 }), -16.82, 2.6, 1.6));
+  apt.add(box(0.18, 0.14, 2.7, std(C.charcoal, { metal: 0.8, rough: 0.2 }), -16.82, 4.9, 0.3));
+  
+  // Glowing cyan border lines
+  apt.add(box(0.19, 4.6, 0.02, new THREE.MeshStandardMaterial({ color: 0x000000, emissive: C.wood, emissiveIntensity: 1.5 }), -16.8, 2.6, -0.92));
+  apt.add(box(0.19, 4.6, 0.02, new THREE.MeshStandardMaterial({ color: 0x000000, emissive: C.wood, emissiveIntensity: 1.5 }), -16.8, 2.6, 1.52));
+  apt.add(box(0.19, 0.02, 2.5, new THREE.MeshStandardMaterial({ color: 0x000000, emissive: C.wood, emissiveIntensity: 1.5 }), -16.8, 4.82, 0.3));
 
-  // Mat
-  apt.add(box(3.2, 0.02, 2.0, std(C.cream, { map: texBoucle }), x, 0.41, 3.2));
+  // Welcome Mat (Re-textured with texGrid)
+  apt.add(box(3.2, 0.02, 2.0, std(C.charcoal, { map: texGrid }), x, 0.41, 3.2));
 
-  // Framed poster
-  poster(x, 3.4, 2.4, 3.0, "UNIT 01", "STUDIO_OS");
+  // Framed poster (glowing grid schematic)
+  poster(x, 3.4, 2.4, 3.0, "COGNITIVE_OS", "CONDO_UNIT_01");
 
   // Logo tag
   const logo = labelPlane(["J V", "EST. 2026"], 0.8, { color: "#202022", fs: 32 });
   logo.position.set(x + 3.2, 4.5, -5.7);
   apt.add(logo);
 
-  // Table
-  apt.add(box(2.4, 0.08, 0.7, std(C.wood, { map: texOak }), x, 1.25, -5.2));
+  // Table (wood top replaced with dark grid metal)
+  apt.add(box(2.4, 0.08, 0.7, std(C.charcoal, { map: texGrid, metal: 0.9, rough: 0.15 }), x, 1.25, -5.2));
   apt.add(box(0.06, 0.85, 0.06, std(C.charcoal), x - 1.1, 0.825, -5.45));
   apt.add(box(0.06, 0.85, 0.06, std(C.charcoal), x + 1.1, 0.825, -5.45));
   apt.add(box(0.06, 0.85, 0.06, std(C.charcoal), x - 1.1, 0.825, -4.95));
   apt.add(box(0.06, 0.85, 0.06, std(C.charcoal), x + 1.1, 0.825, -4.95));
 
-  // Mirror ring
+  // Mirror ring (metallic cyan chrome frame)
   const frameGeo = new THREE.TorusGeometry(0.8, 0.02, 8, 36);
-  const frame = new THREE.Mesh(frameGeo, std(C.charcoal, { metal: 0.2 }));
+  const frame = new THREE.Mesh(frameGeo, std(C.wood, { metal: 1.0, rough: 0.05 }));
   frame.position.set(x, 2.4, -5.96);
   apt.add(frame);
   
@@ -348,12 +380,13 @@ scene.add(apt);
 (function kitchen() {
   const x = -10.8;
   const yBase = 0.4;
-  apt.add(box(1.8, 0.9, 0.8, std(C.wood, { map: texOak }), x, yBase + 0.45, -5.5));
+  // Counter base wood replaced with brushed dark metal
+  apt.add(box(1.8, 0.9, 0.8, std(C.charcoal, { metal: 0.85, rough: 0.25 }), x, yBase + 0.45, -5.5));
   apt.add(box(0.18, 0.03, 0.04, std(C.charcoal), x - 0.4, yBase + 0.75, -5.08));
   apt.add(box(0.18, 0.03, 0.04, std(C.charcoal), x + 0.4, yBase + 0.75, -5.08));
   
-  // Marble top
-  apt.add(box(1.84, 0.06, 0.84, std(C.marble, { map: texMarble, rough: 0.15, metal: 0.1 }), x, yBase + 0.93, -5.5));
+  // Counter top marble replaced with dark slate circuit board pattern
+  apt.add(box(1.84, 0.06, 0.84, std(C.charcoal, { map: texCircuit, rough: 0.3, metal: 0.4 }), x, yBase + 0.93, -5.5));
 
   // Faucet
   const faucetGroup = new THREE.Group();
@@ -376,47 +409,53 @@ scene.add(apt);
   const x = -7.8;
   const yBase = 0.05;
   
-  // Large rug
-  apt.add(box(4.6, 0.01, 7.8, std(C.cream, { map: texBoucle }), x, yBase + 0.01, 0));
+  // Large rug (using Grid texture now)
+  apt.add(box(4.6, 0.01, 7.8, std(C.charcoal, { map: texGrid }), x, yBase + 0.01, 0));
 
-  // Cream sofa
-  apt.add(box(1.2, 0.4, 2.0, std(C.cream, { map: texBoucle }), x - 0.7, yBase + 0.2, -1.0));
-  apt.add(box(1.2, 0.4, 2.0, std(C.cream, { map: texBoucle }), x - 0.7, yBase + 0.2, 1.0));
-  apt.add(box(1.2, 0.4, 1.8, std(C.cream, { map: texBoucle }), x + 0.5, yBase + 0.2, 1.1));
-  apt.add(box(0.6, 0.7, 4.0, std(C.cream, { map: texBoucle }), x - 1.2, yBase + 0.55, 0));
+  // Sofa (replaced cream boucle with dark synth-leather std(C.cream))
+  apt.add(box(1.2, 0.4, 2.0, std(C.cream, { rough: 0.4, metal: 0.15 }), x - 0.7, yBase + 0.2, -1.0));
+  apt.add(box(1.2, 0.4, 2.0, std(C.cream, { rough: 0.4, metal: 0.15 }), x - 0.7, yBase + 0.2, 1.0));
+  apt.add(box(1.2, 0.4, 1.8, std(C.cream, { rough: 0.4, metal: 0.15 }), x + 0.5, yBase + 0.2, 1.1));
+  apt.add(box(0.6, 0.7, 4.0, std(C.cream, { rough: 0.4, metal: 0.15 }), x - 1.2, yBase + 0.55, 0));
 
   // cushions
   apt.add(box(0.2, 0.4, 0.6, std(C.charcoal), x - 0.8, yBase + 0.5, -1.0));
   apt.add(box(0.2, 0.4, 0.6, std(C.woodDark), x - 0.8, yBase + 0.5, 0.8));
 
-  // Coffee Table
-  apt.add(place(cyl(0.7, 0.7, 0.06, std(C.floor, { map: texOak })), x + 0.4, yBase + 0.43, -1.2));
+  // Coffee Table with dark metallic slate top
+  apt.add(place(cyl(0.7, 0.7, 0.06, std(C.charcoal, { metal: 0.85, rough: 0.15 })), x + 0.4, yBase + 0.43, -1.2));
   apt.add(box(0.04, 0.4, 0.04, std(C.charcoal), x + 0.1, yBase + 0.2, -1.5));
   apt.add(box(0.04, 0.4, 0.04, std(C.charcoal), x + 0.7, yBase + 0.2, -1.5));
   apt.add(box(0.04, 0.4, 0.04, std(C.charcoal), x + 0.4, yBase + 0.2, -0.9));
   apt.add(place(cyl(0.05, 0.05, 0.1, std(C.cream)), x + 0.3, yBase + 0.51, -1.1));
 
-  // Arched Floor Lamp
+  // Arched Floor Lamp (sleek cyber-black pole with glowing magenta light)
   const lampGroup = new THREE.Group();
-  lampGroup.add(place(cyl(0.02, 0.02, 2.2, std(C.charcoal)), -1.0, 1.1, -2.6));
-  lampGroup.add(place(cyl(0.22, 0.22, 0.04, std(C.charcoal)), -1.0, 0.02, -2.6));
-  lampGroup.add(box(0.02, 0.02, 1.2, std(C.charcoal), -1.0, 2.2, -2.0));
-  lampGroup.add(box(0.02, 1.0, 0.02, std(C.charcoal), -1.0, 2.6, -1.4));
+  const cyberBlack = std(0x08090c, { metal: 0.9, rough: 0.1 });
+  lampGroup.add(place(cyl(0.02, 0.02, 2.2, cyberBlack), -1.0, 1.1, -2.6));
+  lampGroup.add(place(cyl(0.22, 0.22, 0.04, cyberBlack), -1.0, 0.02, -2.6));
+  lampGroup.add(box(0.02, 0.02, 1.2, cyberBlack, -1.0, 2.2, -2.0));
+  lampGroup.add(box(0.02, 1.0, 0.02, cyberBlack, -1.0, 2.6, -1.4));
   
   const domeGeo = new THREE.SphereGeometry(0.18, 12, 12, 0, Math.PI * 2, 0, Math.PI / 2);
-  const dome = new THREE.Mesh(domeGeo, std(C.charcoal, { metal: 0.8, rough: 0.2 }));
+  const dome = new THREE.Mesh(domeGeo, cyberBlack);
   dome.rotation.x = Math.PI;
   dome.position.set(-1.0, 2.1, -1.4);
   lampGroup.add(dome);
 
-  const pl = new THREE.PointLight(0xfff3e0, 0.6, 6, 2.0);
+  const bulbGeo = new THREE.SphereGeometry(0.08, 8, 8);
+  const bulb = new THREE.Mesh(bulbGeo, new THREE.MeshBasicMaterial({ color: 0xff007f }));
+  bulb.position.set(-1.0, 2.0, -1.4);
+  lampGroup.add(bulb);
+
+  const pl = new THREE.PointLight(0xff007f, 1.8, 8, 1.5);
   pl.position.set(-1.0, 1.9, -1.4);
   lampGroup.add(pl);
   lampGroup.position.set(x, yBase, 0);
   apt.add(lampGroup);
 
   // Digital Art Frame TV (Interactive screen)
-  apt.add(box(4.8, 2.8, 0.12, std(C.wood, { map: texOak }), x, 3.6, -6.04));
+  apt.add(box(4.8, 2.8, 0.12, std(C.charcoal, { metal: 0.9, rough: 0.1 }), x, 3.6, -6.04));
   
   const tvArtTexture = makeTVArtTexture();
   const tvMat = new THREE.MeshBasicMaterial({ map: tvArtTexture, color: 0xe1ded9 });
@@ -433,7 +472,7 @@ scene.add(apt);
   // Credenza
   const cbX = x - 3.4;
   const cbY = 0.4;
-  apt.add(box(0.9, 1.4, 0.8, std(C.wood, { map: texOak }), cbX, cbY + 0.7, -5.3));
+  apt.add(box(0.9, 1.4, 0.8, std(C.charcoal, { map: texGrid }), cbX, cbY + 0.7, -5.3));
   apt.add(place(cyl(0.08, 0.08, 0.35, std(C.cream)), cbX, cbY + 1.57, -5.3));
   apt.add(place(cyl(0.06, 0.06, 0.22, std(C.charcoal)), cbX + 0.2, cbY + 1.51, -5.4));
 
@@ -456,10 +495,10 @@ scene.add(apt);
   const x = -2.5;
   const yBase = 0.4;
   
-  // Desk
-  apt.add(box(5.0, 0.06, 1.4, std(C.charcoal, { rough: 0.7 }), x, yBase + 0.75, -5.0));
-  apt.add(box(0.05, 0.75, 1.3, std(C.charcoal), x - 2.3, yBase + 0.375, -5.0));
-  apt.add(box(0.05, 0.75, 1.3, std(C.charcoal), x + 2.3, yBase + 0.375, -5.0));
+  // Tech Desk (carbon fiber top and matte black steel legs)
+  apt.add(box(5.0, 0.06, 1.4, std(C.charcoal, { map: texGrid, metal: 0.9, rough: 0.2 }), x, yBase + 0.75, -5.0));
+  apt.add(box(0.05, 0.75, 1.3, std(C.charcoal, { metal: 0.95, rough: 0.1 }), x - 2.3, yBase + 0.375, -5.0));
+  apt.add(box(0.05, 0.75, 1.3, std(C.charcoal, { metal: 0.95, rough: 0.1 }), x + 2.3, yBase + 0.375, -5.0));
 
   // Curved Monitor screen
   const screenMatIDE = makeIDETexture();
@@ -478,14 +517,21 @@ scene.add(apt);
   chip.position.set(x, yBase + 0.94, -4.9);
   apt.add(chip);
 
-  // Danish Leather Chair
+  // Glowing mesh ergonomic command seat
   const chairGroup = new THREE.Group();
-  chairGroup.add(box(1.0, 0.08, 1.0, std(0xd2b48c, { rough: 0.45 }), 0, 0.45, 0));
-  chairGroup.add(box(1.0, 0.6, 0.08, std(0xd2b48c, { rough: 0.45 }), 0, 0.75, -0.46));
-  chairGroup.add(place(cyl(0.02, 0.02, 0.45, std(C.charcoal)), -0.42, 0.225, 0.42));
-  chairGroup.add(place(cyl(0.02, 0.02, 0.45, std(C.charcoal)), 0.42, 0.225, 0.42));
-  chairGroup.add(place(cyl(0.02, 0.02, 0.45, std(C.charcoal)), -0.42, 0.225, -0.42));
-  chairGroup.add(place(cyl(0.02, 0.02, 0.45, std(C.charcoal)), 0.42, 0.225, -0.42));
+  chairGroup.add(box(1.0, 0.08, 1.0, std(C.charcoal, { map: texGrid, rough: 0.3 }), 0, 0.45, 0));
+  chairGroup.add(box(1.0, 0.6, 0.08, std(C.charcoal, { map: texGrid, rough: 0.3 }), 0, 0.75, -0.46));
+  
+  // Glowing cyan border light tube on seat back
+  chairGroup.add(box(1.02, 0.04, 0.1, new THREE.MeshStandardMaterial({ color: 0x000000, emissive: C.wood, emissiveIntensity: 1.5 }), 0, 1.04, -0.46));
+  chairGroup.add(box(0.04, 0.62, 0.1, new THREE.MeshStandardMaterial({ color: 0x000000, emissive: C.wood, emissiveIntensity: 1.5 }), -0.49, 0.75, -0.46));
+  chairGroup.add(box(0.04, 0.62, 0.1, new THREE.MeshStandardMaterial({ color: 0x000000, emissive: C.wood, emissiveIntensity: 1.5 }), 0.49, 0.75, -0.46));
+
+  // Steel support legs
+  chairGroup.add(place(cyl(0.025, 0.025, 0.45, std(C.charcoal, { metal: 0.95, rough: 0.1 })), -0.42, 0.225, 0.42));
+  chairGroup.add(place(cyl(0.025, 0.025, 0.45, std(C.charcoal, { metal: 0.95, rough: 0.1 })), 0.42, 0.225, 0.42));
+  chairGroup.add(place(cyl(0.025, 0.025, 0.45, std(C.charcoal, { metal: 0.95, rough: 0.1 })), -0.42, 0.225, -0.42));
+  chairGroup.add(place(cyl(0.025, 0.025, 0.45, std(C.charcoal, { metal: 0.95, rough: 0.1 })), 0.42, 0.225, -0.42));
   chairGroup.position.set(x, yBase, -3.4);
   apt.add(chairGroup);
 
@@ -494,7 +540,8 @@ scene.add(apt);
   apt.add(box(0.48, 0.02, 0.32, std(C.charcoal, { metal: 0.9, rough: 0.25 }), x - 1.2, yBase + 0.79, -4.6));
   apt.add(place(cyl(0.04, 0.04, 0.1, std(C.cream)), x + 1.2, yBase + 0.83, -4.6));
 
-  const sign = labelPlane(["PROJECTS", "SHOWCASE"], 0.72, { color: "#202022", fs: 38 });
+  // Orbitron Text Sign: CONDO TERMINAL // SECURE_PORTFOLIO
+  const sign = labelPlane(["CONDO TERMINAL", "SECURE_PORTFOLIO"], 0.6, { color: "#00f3ff", fs: 34, font: "'Orbitron', 'JetBrains Mono', sans-serif" });
   sign.position.set(x + 3.2, 4.3, -5.7);
   apt.add(sign);
 
@@ -509,12 +556,12 @@ scene.add(apt);
   const x = 3.5;
   const yBase = 0.4;
   
-  // Slats screen wall partitions
+  // Slats screen wall partitions (dark slate metal)
   for (let sx = 0.6; sx <= 6.8; sx += 0.4) {
-    apt.add(box(0.04, 3.0, 0.04, std(C.wood, { map: texOak }), sx, yBase + 1.5, -4.2));
+    apt.add(box(0.04, 3.0, 0.04, std(C.charcoal, { metal: 0.8, rough: 0.2 }), sx, yBase + 1.5, -4.2));
   }
 
-  // Skills display wood plaques with charcoal print text
+  // Skills display dark carbon fiber plaques with Orbitron text
   const skills = [
     ["THREE.JS", "WEBGL"], ["JAVASCRIPT", "TYPESCRIPT"], ["REACT", "NEXT.JS"],
     ["GSAP", "CSS MOTION"], ["HTML5", "CSS3"], ["UI / UX", "FIGMA"],
@@ -523,52 +570,61 @@ scene.add(apt);
     const cx = x - 2.8 + (i % 3) * 2.8;
     const cy = yBase + 1.8 - Math.floor(i / 3) * 1.0;
     
-    const plaqueMat = makeLabel(s, { isWood: true, box: true, fs: 32, color: "#202022" }).tex;
+    // Carbon fiber look, Orbitron typography, neon cyan borders
+    const plaqueMat = makeLabel(s, { isCarbon: true, fs: 30, color: "#00f3ff", font: "'Orbitron', 'JetBrains Mono', sans-serif" }).tex;
     const plaque = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 0.72), new THREE.MeshBasicMaterial({ map: plaqueMat, side: THREE.DoubleSide }));
     plaque.position.set(cx, cy, -5.96);
     apt.add(plaque);
     
-    apt.add(box(2.4, 0.8, 0.05, std(C.woodDark), cx, cy, -5.99));
+    // Backing plate (glowing cyan borders)
+    apt.add(box(2.4, 0.8, 0.05, new THREE.MeshStandardMaterial({ color: 0x000000, emissive: C.wood, emissiveIntensity: 0.8 }), cx, cy, -5.99));
   });
 
   const stackTag = labelPlane(["SKILLS & TOOLING"], 0.28, { color: "#6e7282", fs: 36 });
   stackTag.position.set(x, yBase + 2.5, -5.8);
   apt.add(stackTag);
 
-  // LOFT platform at yBase + 1.25 = 1.65
-  apt.add(box(0.12, 1.2, 0.12, std(C.wood, { map: texOak }), 0.8, yBase + 0.6, -1.0));
-  apt.add(box(0.12, 1.2, 0.12, std(C.wood, { map: texOak }), 6.8, yBase + 0.6, -1.0));
-  apt.add(box(0.12, 1.2, 0.12, std(C.wood, { map: texOak }), 0.8, yBase + 0.6, -4.0));
-  apt.add(box(0.12, 1.2, 0.12, std(C.wood, { map: texOak }), 6.8, yBase + 0.6, -4.0));
+  // LOFT platform columns and mezzanine ladder set to dark slate metal
+  apt.add(box(0.12, 1.2, 0.12, std(C.charcoal, { metal: 0.9, rough: 0.15 }), 0.8, yBase + 0.6, -1.0));
+  apt.add(box(0.12, 1.2, 0.12, std(C.charcoal, { metal: 0.9, rough: 0.15 }), 6.8, yBase + 0.6, -1.0));
+  apt.add(box(0.12, 1.2, 0.12, std(C.charcoal, { metal: 0.9, rough: 0.15 }), 0.8, yBase + 0.6, -4.0));
+  apt.add(box(0.12, 1.2, 0.12, std(C.charcoal, { metal: 0.9, rough: 0.15 }), 6.8, yBase + 0.6, -4.0));
 
-  apt.add(box(6.2, 0.1, 3.4, std(C.wood, { map: texOak }), 3.8, yBase + 1.25, -2.5));
+  apt.add(box(6.2, 0.1, 3.4, std(C.charcoal, { map: texGrid, metal: 0.8, rough: 0.2 }), 3.8, yBase + 1.25, -2.5));
   apt.add(box(6.2, 0.04, 0.04, std(C.charcoal), 3.8, yBase + 1.85, -0.85));
   for (let rx = 1.0; rx <= 6.6; rx += 0.8) {
     apt.add(box(0.02, 0.6, 0.02, std(C.charcoal), rx, yBase + 1.55, -0.85));
   }
 
-  // Ladder
+  // Mezzanine Ladder (dark slate metal)
   const ladderGroup = new THREE.Group();
-  ladderGroup.add(place(cyl(0.02, 0.02, 1.6, std(C.woodDark)), -0.25, 0.8, 0));
-  ladderGroup.add(place(cyl(0.02, 0.02, 1.6, std(C.woodDark)), 0.25, 0.8, 0));
+  const darkSlateMat = std(C.charcoal, { metal: 0.9, rough: 0.2 });
+  ladderGroup.add(place(cyl(0.02, 0.02, 1.6, darkSlateMat), -0.25, 0.8, 0));
+  ladderGroup.add(place(cyl(0.02, 0.02, 1.6, darkSlateMat), 0.25, 0.8, 0));
   for (let r = 0.25; r <= 1.4; r += 0.25) {
-    ladderGroup.add(box(0.5, 0.02, 0.04, std(C.woodDark), 0, r, 0));
+    ladderGroup.add(box(0.5, 0.02, 0.04, darkSlateMat, 0, r, 0));
   }
   ladderGroup.rotation.x = 0.18;
   ladderGroup.position.set(1.4, yBase, -0.8);
   apt.add(ladderGroup);
 
-  // Bed
+  // Bed (dark metallic gray sheets and neon cyan accent sheets)
   const bedX = 4.4;
   const bedY = yBase + 1.3;
   const bedZ = -2.6;
-  apt.add(box(2.8, 0.22, 1.8, std(C.cream, { map: texBoucle }), bedX, bedY + 0.11, bedZ));
-  apt.add(box(2.0, 0.23, 1.82, std(0xffffff), bedX + 0.4, bedY + 0.11, bedZ));
-  apt.add(box(0.8, 0.24, 1.84, std(C.muted), bedX + 1.0, bedY + 0.11, bedZ));
-  apt.add(box(0.5, 0.12, 0.6, std(C.cream), bedX - 1.0, bedY + 0.26, bedZ - 0.4));
-  apt.add(box(0.5, 0.12, 0.6, std(C.cream), bedX - 1.0, bedY + 0.26, bedZ + 0.4));
-  apt.add(box(0.5, 0.35, 0.5, std(C.wood, { map: texOak }), bedX - 1.0, bedY + 0.175, bedZ - 1.1));
-  apt.add(place(cyl(0.04, 0.04, 0.12, std(0xffffff, { opacity: 0.3, rough: 0.1 })), bedX - 1.0, bedY + 0.41, bedZ - 1.1));
+  // Bed base
+  apt.add(box(2.8, 0.22, 1.8, std(C.cream, { metal: 0.7, rough: 0.3 }), bedX, bedY + 0.11, bedZ));
+  // Dark metallic gray main sheet
+  apt.add(box(2.0, 0.23, 1.82, std(0x282b35, { metal: 0.8, rough: 0.3 }), bedX + 0.4, bedY + 0.11, bedZ));
+  // Neon cyan accent sheet
+  apt.add(box(0.8, 0.24, 1.84, std(C.wood, { metal: 0.5, rough: 0.4 }), bedX + 1.0, bedY + 0.11, bedZ));
+  // Pillows
+  apt.add(box(0.5, 0.12, 0.6, std(C.charcoal), bedX - 1.0, bedY + 0.26, bedZ - 0.4));
+  apt.add(box(0.5, 0.12, 0.6, std(C.charcoal), bedX - 1.0, bedY + 0.26, bedZ + 0.4));
+  // Nightstand (dark metal grid)
+  apt.add(box(0.5, 0.35, 0.5, std(C.charcoal, { map: texGrid, metal: 0.9, rough: 0.15 }), bedX - 1.0, bedY + 0.175, bedZ - 1.1));
+  // Nightstand lamp
+  apt.add(place(cyl(0.04, 0.04, 0.12, std(C.wood, { metal: 0.8, rough: 0.2 })), bedX - 1.0, bedY + 0.41, bedZ - 1.1));
 })();
 
 // ============================================================
@@ -589,8 +645,8 @@ scene.add(apt);
   apt.add(box(0.02, 6.2, 4.3, glassMat, 8.0, yBase + 3.1, -1.85));
   apt.add(box(0.02, 6.2, 4.3, glassMat, 8.0, yBase + 3.1, 2.45));
 
-  // Table & Bench
-  apt.add(box(1.8, 0.05, 1.1, std(C.wood, { map: texOak }), x + 1.2, yBase + 0.72, 1.8));
+  // Table & Bench (tops changed to steel grid plates)
+  apt.add(box(1.8, 0.05, 1.1, std(C.charcoal, { map: texGrid, metal: 0.95, rough: 0.15 }), x + 1.2, yBase + 0.72, 1.8));
   apt.add(box(0.06, 0.7, 0.06, std(C.charcoal), x + 0.4, yBase + 0.35, 1.4));
   apt.add(box(0.06, 0.7, 0.06, std(C.charcoal), x + 2.0, yBase + 0.35, 1.4));
   apt.add(box(0.06, 0.7, 0.06, std(C.charcoal), x + 0.4, yBase + 0.35, 2.2));
@@ -603,7 +659,7 @@ scene.add(apt);
   projMesh.position.set(x + 1.2, yBase + 0.79, 1.8);
   apt.add(projMesh);
 
-  // Spinning wireframe hologram globe (warm oak color)
+  // Spinning wireframe hologram globe
   const holoGeo = new THREE.IcosahedronGeometry(0.22, 1);
   const holoMat = new THREE.MeshBasicMaterial({ color: C.wood, wireframe: true, transparent: true, opacity: 0.55 });
   const holoMesh = new THREE.Mesh(holoGeo, holoMat);
@@ -615,25 +671,50 @@ scene.add(apt);
   holoLight.position.set(x + 1.2, yBase + 1.1, 1.8);
   scene.add(holoLight);
 
-  apt.add(box(1.4, 0.04, 0.4, std(C.wood, { map: texOak }), x + 1.2, yBase + 0.42, 0.8));
+  // Bench top changed to steel grid plates
+  apt.add(box(1.4, 0.04, 0.4, std(C.charcoal, { map: texGrid, metal: 0.95, rough: 0.15 }), x + 1.2, yBase + 0.42, 0.8));
   apt.add(box(0.04, 0.4, 0.3, std(C.charcoal), x + 0.6, yBase + 0.2, 0.8));
   apt.add(box(0.04, 0.4, 0.3, std(C.charcoal), x + 1.8, yBase + 0.2, 0.8));
 
   plant(x + 2.8, yBase, -1.5, "leafy", 0.7);
 
-  const sign = labelPlane(["LET'S BUILD", "TOGETHER"], 1.1, { color: "#202022", fs: 36 });
+  // Orbitron Text Sign: LET'S BUILD // TOGETHER
+  const sign = labelPlane(["LET'S BUILD", "TOGETHER"], 1.1, { color: "#00f3ff", fs: 36, font: "'Orbitron', 'JetBrains Mono', sans-serif" });
   sign.position.set(x - 2.8, 4.5, -5.6);
   apt.add(sign);
   plant(x - 3.8, yBase, -5.2, "leafy", 0.6);
 
-  // Skyline
+  // Skyline (dark concrete monoliths with glowing neon window stripes)
   const cityscape = new THREE.Group();
+  const monolithMat = std(0x111218, { rough: 0.9, metal: 0.1 }); // Dark concrete
+  const neonMats = [
+    new THREE.MeshBasicMaterial({ color: 0x00f3ff }), // neon cyan window stripe
+    new THREE.MeshBasicMaterial({ color: 0xff007f })  // neon magenta window stripe
+  ];
+  
   for (let i = 0; i < 18; i++) {
     const h = 5 + Math.random() * 12;
     const w = 2.0 + Math.random() * 3.0;
     const bx = 24 + Math.random() * 20;
     const bz = -20 + Math.random() * 40;
-    cityscape.add(box(w, h, w, std(0xdbe0e4), bx, h / 2 - 3, bz));
+    const by = h / 2 - 3;
+    
+    // The building block
+    cityscape.add(box(w, h, w, monolithMat, bx, by, bz));
+    
+    // Add glowing window stripes on the front face (facing the apartment, towards negative X direction)
+    const stripesCount = 2 + Math.floor(Math.random() * 3);
+    const stripeMat = neonMats[i % neonMats.length];
+    for (let s = 0; s < stripesCount; s++) {
+      const stripeH = 0.8 + Math.random() * 1.5;
+      const stripeW = 0.08 + Math.random() * 0.15;
+      const sy = by - h/2 + Math.random() * (h - 1);
+      const sz = bz - w/2 + Math.random() * w;
+      
+      const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.04, stripeH, stripeW), stripeMat);
+      stripe.position.set(bx - w/2 - 0.02, sy, sz);
+      cityscape.add(stripe);
+    }
   }
   apt.add(cityscape);
 })();
@@ -711,20 +792,54 @@ function bookStack(x, z, rotY, yHeight = 0.02) {
 }
 
 function poster(x, y, w, h, titleText, subtitleText) {
-  apt.add(box(w + 0.06, h + 0.06, 0.02, std(C.charcoal), x, y, -6.04));
+  // Poster backing frame: dark metal
+  apt.add(box(w + 0.06, h + 0.06, 0.02, std(C.charcoal, { metal: 0.9, rough: 0.1 }), x, y, -6.04));
+  
   const canvasP = document.createElement("canvas");
   canvasP.width = 256; canvasP.height = 360;
   const ctx = canvasP.getContext("2d");
-  ctx.fillStyle = "#faf9f6"; ctx.fillRect(0, 0, 256, 360);
-  ctx.fillStyle = "#202022"; ctx.textAlign = "center"; ctx.font = "italic 32px Georgia, serif";
-  ctx.fillText(titleText, 128, 140);
-  ctx.strokeStyle = "#cca37a"; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(78, 170); ctx.lineTo(178, 170); ctx.stroke();
-  ctx.fillStyle = "#6e7282"; ctx.font = "14px monospace";
-  ctx.fillText(subtitleText, 128, 205);
-  ctx.fillText("// UNIT_01 OS", 128, 225);
+  
+  // OLED Dark mode background for poster
+  ctx.fillStyle = "#07080d";
+  ctx.fillRect(0, 0, 256, 360);
+  
+  // Draw thin cyan grid schematic lines
+  ctx.strokeStyle = "rgba(0, 243, 255, 0.12)";
+  ctx.lineWidth = 1;
+  for (let gx = 0; gx < 256; gx += 20) {
+    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, 360); ctx.stroke();
+  }
+  for (let gy = 0; gy < 360; gy += 20) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(256, gy); ctx.stroke();
+  }
+  
+  // Draw simple schematic shapes (circles/lines in cyan/pink)
+  ctx.strokeStyle = "rgba(0, 243, 255, 0.3)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(128, 150, 60, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(128, 150, 40, 0, Math.PI * 2); ctx.stroke();
+  
+  ctx.strokeStyle = "#ff007f"; // pink pathway
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(60, 150); ctx.lineTo(198, 150); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(128, 80); ctx.lineTo(128, 220); ctx.stroke();
+  
+  // Glowing title texts
+  ctx.fillStyle = "#00f3ff"; // Glowing neon cyan
+  ctx.textAlign = "center";
+  ctx.font = "bold 16px 'Orbitron', 'JetBrains Mono', monospace";
+  ctx.fillText(titleText, 128, 255);
+  
+  ctx.fillStyle = "#6e7282";
+  ctx.font = "11px monospace";
+  ctx.fillText(subtitleText, 128, 285);
+  
+  ctx.fillStyle = "#ff007f"; // hot pink OS label
+  ctx.font = "bold 10px monospace";
+  ctx.fillText("// SECURE_OS_LOADED", 128, 305);
 
   const posterTex = new THREE.CanvasTexture(canvasP);
+  // Basic material is self-illuminating, which gives it that "glowing schematic" look
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: posterTex, side: THREE.DoubleSide }));
   m.position.set(x, y, -6.02);
   apt.add(m);
@@ -735,55 +850,87 @@ function makeTVArtTexture() {
   cv.width = 512; cv.height = 300;
   const ctx = cv.getContext("2d");
   
-  // Plaster off-white background
-  ctx.fillStyle = "#eeece8";
+  // OLED Dark background
+  ctx.fillStyle = "#07080d";
   ctx.fillRect(0, 0, 512, 300);
   
-  // Subtle schematic background grid lines
-  ctx.strokeStyle = "rgba(45, 45, 48, 0.04)";
+  // Cybernetic Grid
+  ctx.strokeStyle = "rgba(0, 243, 255, 0.15)";
   ctx.lineWidth = 1;
-  for (let gx = 0; gx < 512; gx += 40) {
+  for (let gx = 0; gx < 512; gx += 32) {
     ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, 300); ctx.stroke();
   }
-  for (let gy = 0; gy < 300; gy += 40) {
+  for (let gy = 0; gy < 300; gy += 32) {
     ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(512, gy); ctx.stroke();
   }
   
-  // Draw minimalist organic shapes
-  ctx.fillStyle = "#cca37a"; // Warm Oak circle
-  ctx.beginPath(); ctx.arc(320, 150, 90, 0, Math.PI * 2); ctx.fill();
+  // Outer diagnostics frame
+  ctx.strokeStyle = "#ff007f"; // hot pink frame
+  ctx.lineWidth = 2;
+  ctx.strokeRect(10, 10, 492, 280);
   
-  ctx.fillStyle = "#202022"; // Charcoal rectangle arch
-  ctx.fillRect(140, 60, 100, 180);
+  // Concentric radar/diagnostic circles in center
+  ctx.strokeStyle = "rgba(0, 243, 255, 0.5)";
+  ctx.beginPath(); ctx.arc(256, 150, 80, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = "rgba(255, 0, 127, 0.4)";
+  ctx.beginPath(); ctx.arc(256, 150, 50, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = "rgba(0, 243, 255, 0.8)";
+  ctx.beginPath(); ctx.arc(256, 150, 20, 0, Math.PI * 2); ctx.stroke();
   
-  ctx.fillStyle = "#9a724d"; // Clay semi-circle
-  ctx.beginPath(); ctx.arc(240, 190, 60, Math.PI, 0); ctx.fill();
+  // Radar sweeping lines or angle ticks
+  ctx.strokeStyle = "rgba(0, 243, 255, 0.3)";
+  for (let d = 0; d < 360; d += 45) {
+    const rad = d * Math.PI / 180;
+    ctx.beginPath();
+    ctx.moveTo(256 + Math.cos(rad) * 20, 150 + Math.sin(rad) * 20);
+    ctx.lineTo(256 + Math.cos(rad) * 80, 150 + Math.sin(rad) * 80);
+    ctx.stroke();
+  }
+  
+  // Cybernetic diagnostic waveform
+  ctx.strokeStyle = "#39ff14"; // Acid green waveform
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let tx = 20; tx < 492; tx += 4) {
+    const ty = 150 + Math.sin(tx * 0.05) * 15 * Math.cos(tx * 0.01);
+    if (tx === 20) ctx.moveTo(tx, ty);
+    else ctx.lineTo(tx, ty);
+  }
+  ctx.stroke();
 
-  // Draw blueprint overlay lines
-  ctx.strokeStyle = "rgba(204, 163, 122, 0.28)";
-  ctx.lineWidth = 1.2;
-  ctx.beginPath(); ctx.arc(240, 190, 80, 0, Math.PI * 2); ctx.stroke();
-
-  ctx.strokeStyle = "#202022"; // Minimalist pointer line
-  ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(100, 150); ctx.lineTo(412, 150); ctx.stroke();
-
-  // Dotted laser guidelines
-  ctx.setLineDash([4, 6]);
-  ctx.strokeStyle = "rgba(154, 114, 77, 0.35)";
-  ctx.beginPath(); ctx.moveTo(240, 20); ctx.lineTo(240, 280); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(40, 150); ctx.lineTo(472, 150); ctx.stroke();
-  ctx.setLineDash([]); // Reset dash
-
-  // Code readouts / technical labels
+  // Technical readouts / text overlays
+  ctx.font = "bold 10px monospace";
+  ctx.fillStyle = "#00f3ff"; // Cyan
+  ctx.fillText("SYS.REF: CONDO_UNIT_01", 24, 30);
+  ctx.fillText("SECTOR: lounge_cyber", 24, 45);
+  ctx.fillText("MODULE: DISPLAY_MONITOR", 24, 60);
+  
+  ctx.fillStyle = "#ff007f"; // Magenta
+  ctx.fillText("CORE_STATUS: ACTIVE", 24, 250);
+  ctx.fillText("NET_INTEGRITY: 99.87%", 24, 265);
+  
+  ctx.fillStyle = "#39ff14"; // Acid Green
+  ctx.fillText("SECURE // CONNECTION", 360, 30);
+  ctx.fillText("FPS: 60.00 // BUFFER_OK", 360, 45);
+  ctx.fillText("REFRESH: 144HZ", 360, 60);
+  
+  // Draw some random code-like numbers
+  ctx.fillStyle = "rgba(0, 243, 255, 0.5)";
+  ctx.font = "8px monospace";
+  ctx.fillText("0x7F4A9C // MEM_OK", 390, 240);
+  ctx.fillText("ADDR: 192.168.10.8", 390, 252);
+  ctx.fillText("PORT: 8080 // SECURE", 390, 264);
+  
+  // Center label overlay
+  ctx.fillStyle = "#07080d";
+  ctx.fillRect(216, 140, 80, 20);
+  ctx.strokeStyle = "#00f3ff";
+  ctx.strokeRect(216, 140, 80, 20);
+  ctx.fillStyle = "#00f3ff";
   ctx.font = "9px monospace";
-  ctx.fillStyle = "rgba(45, 45, 48, 0.45)";
-  ctx.fillText("SYS.REF: LOUNGE_01", 24, 26);
-  ctx.fillText("COORD: X -7.80 Y 3.60 Z -5.96", 24, 38);
-  ctx.fillText("AESTHETIC_SYS: SCANDINAVIAN_LOFT", 24, 50);
-  ctx.fillText("[LOCK STATE: SECURE // ACTIVE]", 24, 282);
-  ctx.fillText("SCALE: 1:25", 432, 282);
-
+  ctx.textAlign = "center";
+  ctx.fillText("DIAGNOSTIC", 256, 153);
+  
   const tex = new THREE.CanvasTexture(cv);
   return tex;
 }
@@ -793,70 +940,72 @@ function makeIDETexture() {
   cv.width = 1024; cv.height = 512;
   const ctx = cv.getContext("2d");
   
-  // Off-white editor
-  ctx.fillStyle = "#FAF9F8";
+  // OLED Dark Editor Background
+  ctx.fillStyle = "#07080d";
   ctx.fillRect(0, 0, 1024, 512);
   
-  // Sidebar
-  ctx.fillStyle = "#F3F1ED";
+  // Dark Sidebar
+  ctx.fillStyle = "#12131c";
   ctx.fillRect(0, 0, 240, 512);
   
-  ctx.font = "bold 15px 'Inter', sans-serif";
-  ctx.fillStyle = "#6e7282";
-  ctx.fillText("EXPLORER: 3D-PORTFOLIO", 20, 36);
+  ctx.font = "bold 15px 'Orbitron', 'JetBrains Mono', monospace";
+  ctx.fillStyle = "#00f3ff"; // Glowing cyan explorer title
+  ctx.fillText("SECURE_TERM: CONDO_OS", 20, 36);
   
-  const folders = ["▸ .git", "▸ css", "▾ js", "    ▤ apartment.js", "    ▤ main.js", "▸ images", "▤ apartment.html"];
+  const folders = ["▸ .sys_core", "▸ firmware", "▾ modules", "    ▤ condo_core.py", "    ▤ interface.js", "▸ secure_logs", "▤ config.json"];
   folders.forEach((f, i) => {
-    ctx.font = f.includes("apartment.js") ? "bold 15px 'Inter', sans-serif" : "15px 'Inter', sans-serif";
-    ctx.fillStyle = f.includes("apartment.js") ? "#cca37a" : "#202022";
+    ctx.font = f.includes("condo_core.py") ? "bold 15px 'JetBrains Mono', monospace" : "15px 'JetBrains Mono', monospace";
+    ctx.fillStyle = f.includes("condo_core.py") ? "#39ff14" : "#6e7282";
     ctx.fillText(f, 30, 80 + i * 28);
   });
   
   // Tab Bar
-  ctx.fillStyle = "#EAE6E1";
+  ctx.fillStyle = "#0a0c16";
   ctx.fillRect(240, 0, 784, 45);
-  ctx.fillStyle = "#FAF9F8";
-  ctx.fillRect(240, 0, 160, 45);
-  ctx.font = "14px monospace";
-  ctx.fillStyle = "#202022";
-  ctx.fillText("showcase.sh", 264, 26);
-  ctx.fillStyle = "#cca37a";
-  ctx.fillRect(240, 41, 160, 4);
+  ctx.fillStyle = "#07080d";
+  ctx.fillRect(240, 0, 180, 45);
+  ctx.font = "14px 'JetBrains Mono', monospace";
+  ctx.fillStyle = "#00f3ff"; // Neon Cyan active tab text
+  ctx.fillText("condo_core.py", 264, 26);
+  ctx.fillStyle = "#39ff14"; // Acid Green active tab underline
+  ctx.fillRect(240, 41, 180, 4);
   
   const lines = [
-    "#!/bin/bash",
-    "echo \"Initializing Retro Pixel 3D Loft OS...\"",
-    "STATUS=0",
-    "for sector in renderer physics HUD_overlays; do",
-    "  echo \"Configuring retro rendering scaling: 4x\"",
-    "  compile_pixelated_engine --aliasing=crisp || STATUS=1",
-    "done",
-    "if [ $STATUS -eq 0 ]; then",
-    "  echo \"SYSTEM SUCCESS: Retro pixelated 3D world ready.\"",
-    "  launch_spatial_interface --interactive",
-    "else",
-    "  echo \"ERROR: Subpixel rasterization mismatch.\"",
-    "fi",
+    "import time",
+    "import condo_firmware as sys",
     "",
-    "jvoclarit@pixel_3d_os:~$ _"
+    "def initiate_condo_protocols():",
+    "    print(\"Initializing Security Firewall...\")",
+    "    sys.firewall.load_rules(profile='high_secure')",
+    "    sys.power_grid.set_glow_state(color='cyan', intensity=1.8)",
+    "    for zone in range(5):",
+    "        sys.log(f\"Checking stability: Zone 0{zone+1}... OK\")",
+    "        time.sleep(0.1)",
+    "    ",
+    "    if sys.get_auth_state() == \"AUTHORIZED\":",
+    "        print(\"ACCESS GRANTED // PORTFOLIO READY.\")",
+    "        return True",
+    "    return False",
+    "",
+    "initiate_condo_protocols() # EXECUTE"
   ];
   
-  ctx.font = "17px 'JetBrains Mono', monospace";
+  ctx.font = "16px 'JetBrains Mono', monospace";
   lines.forEach((line, i) => {
-    ctx.fillStyle = "#b4b2ac";
-    ctx.fillText((i + 1).toString().padStart(2), 268, 90 + i * 26);
-    if (line.startsWith("#")) {
-      ctx.fillStyle = "#8d91a2";
-    } else if (line.includes("echo") || line.includes("compile_pixelated_engine") || line.includes("launch_spatial_interface")) {
-      ctx.fillStyle = "#9a724d";
-    } else if (line.includes("\"") || line.includes("jvoclarit")) {
-      ctx.fillStyle = "#cca37a";
-    } else if (line.includes("if ") || line.includes("for ") || line.includes("then") || line.includes("else") || line.includes("fi") || line.includes("done")) {
-      ctx.fillStyle = "#202022";
+    // Line number
+    ctx.fillStyle = "#3a3f50";
+    ctx.fillText((i + 1).toString().padStart(2), 268, 86 + i * 25);
+    
+    if (line.trim().startsWith("import") || line.trim().startsWith("def ") || line.trim().startsWith("return ") || line.trim().startsWith("if ") || line.trim().startsWith("for ")) {
+      ctx.fillStyle = "#ff007f"; // hot pink keywords
+    } else if (line.includes("\"") || line.includes("'")) {
+      ctx.fillStyle = "#39ff14"; // acid green strings
+    } else if (line.includes("print") || line.includes("initiate_condo_protocols")) {
+      ctx.fillStyle = "#00f3ff"; // cyan functions
     } else {
-      ctx.fillStyle = "#4a4944";
+      ctx.fillStyle = "#ffffff"; // white code
     }
-    ctx.fillText(line, 310, 90 + i * 26);
+    ctx.fillText(line, 310, 86 + i * 25);
   });
   
   const tex = new THREE.CanvasTexture(cv);
