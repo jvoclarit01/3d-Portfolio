@@ -458,7 +458,7 @@ scene.add(apt);
   apt.add(box(4.8, 2.8, 0.12, std(C.charcoal, { metal: 0.9, rough: 0.1 }), x, 3.6, -6.04));
   
   const tvArtTexture = makeTVArtTexture();
-  const tvMat = new THREE.MeshBasicMaterial({ map: tvArtTexture, color: 0xe1ded9 });
+  const tvMat = new THREE.MeshStandardMaterial({ map: tvArtTexture, color: 0xffffff, roughness: 0.2, metalness: 0.1, emissive: new THREE.Color(0x111111) });
   const tv = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.4), tvMat);
   tv.position.set(x, 3.6, -5.96);
   tv.userData = { projectId: "about", type: "tv" };
@@ -1009,7 +1009,7 @@ function makeIDETexture() {
   });
   
   const tex = new THREE.CanvasTexture(cv);
-  return new THREE.MeshBasicMaterial({ map: tex, color: 0xffffff });
+  return new THREE.MeshStandardMaterial({ map: tex, color: 0xffffff, roughness: 0.2, metalness: 0.1, emissive: new THREE.Color(0x222222) });
 }
 
 // ============================================================
@@ -1252,28 +1252,31 @@ function tick() {
 
   // Hover Raycasting and highlight (scaled coords)
   if (!isTouch && interactiveObjects.length > 0) {
+    let hitObj = null;
     if (zoomTarget === 0) {
       raycaster.setFromCamera(mouseNDC, camera);
       const intersects = raycaster.intersectObjects(interactiveObjects);
       if (intersects.length > 0) {
-        const hitObj = intersects[0].object;
-        document.body.style.cursor = "pointer";
-        hitObj.material.color.setHex(0xffffff);
-      } else {
-        document.body.style.cursor = "default";
-        interactiveObjects.forEach(obj => {
-          obj.material.color.setHex(0xe1ded9);
-        });
+        hitObj = intersects[0].object;
       }
+    }
+
+    interactiveObjects.forEach(obj => {
+      if (zoomTarget === 1 && obj.userData.projectId === currentZoomedId) {
+        obj.material.emissive.setHex(0x00f3ff);
+        obj.material.emissiveIntensity = 1.2;
+      } else {
+        obj.material.emissive.setHex(0x111111);
+        obj.material.emissiveIntensity = 0.5;
+      }
+    });
+
+    if (hitObj) {
+      hitObj.material.emissive.setHex(0x00f3ff); // glowing cyan
+      hitObj.material.emissiveIntensity = 1.8;
+      document.body.style.cursor = "pointer";
     } else {
       document.body.style.cursor = "default";
-      interactiveObjects.forEach(obj => {
-        if (obj.userData.projectId === currentZoomedId) {
-          obj.material.color.setHex(0xffffff);
-        } else {
-          obj.material.color.setHex(0xe1ded9);
-        }
-      });
     }
   }
 
