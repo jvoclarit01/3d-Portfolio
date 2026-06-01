@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jan Vincent Oclarit — Studio Apartment</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%2300f3ff'/><stop offset='50%' stop-color='%23ff007f'/><stop offset='100%' stop-color='%23a855f7'/></linearGradient></defs><text x='50%' y='52%' font-family='Orbitron, sans-serif' font-weight='900' font-size='60' fill='url(%23g)' text-anchor='middle' dominant-baseline='central'>JV</text></svg>" />
+  <meta name="description" content="Explore Jan Vincent Oclarit's portfolio as a scroll-driven 3D cyberpunk studio apartment — each room is a section of the work." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/apartment.css" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ============================ BOOT ============================ -->
+  <div class="boot" id="boot">
+    <div class="boot__inner">
+      <div class="boot__title">UNIT&nbsp;01 <b>// STUDIO_OS</b></div>
+      <div class="boot__sub">Initializing spatial interface</div>
+      <div class="boot__bar"><i></i></div>
+    </div>
+  </div>
+
+  <!-- ============================ WEBGL STAGE ============================ -->
+  <canvas id="apt-scene" class="apt-scene" aria-hidden="true"></canvas>
+
+  <!-- ============================ COLUMN GRID ============================ -->
+  <div class="grid-overlay" aria-hidden="true">
+    <div class="grid-overlay__cols"></div>
+    <div class="grid-overlay__frame"></div>
+  </div>
+
+  <!-- ============================ SCROLL ROOMS ============================ -->
+  <main class="scroll-track">
+
+    <!-- 0 · FOYER → Home -->
+    <section class="panel panel--left" id="room-foyer" aria-label="Foyer — Welcome">
+      <article class="zone-card with-dots with-diag">
+        <div class="zone-card__meta"><span>[ FILE 01 / 05 ]</span><b>// FOYER</b></div>
+        <div class="zone-card__body">
+          <span class="zone-card__tag">Welcome // Unit 01</span>
+          <h1 class="zone-card__title"><span class="grad">Jan Vincent Oclarit</span></h1>
+          <p class="zone-card__role">Creative Engineer &amp; 3D Web Developer</p>
+          <p class="zone-card__text">A driven builder with a curious mind for the ever-evolving world of technology and design. I blend logical problem-solving with creative expression.</p>
+          <p class="scroll-cue">Scroll to walk through <i></i></p>
+        </div>
+      </article>
+    </section>
+
+    <!-- 1 · LOUNGE → About -->
+    <section class="panel panel--right" id="room-lounge" aria-label="Lounge — About">
+      <article class="zone-card with-dots with-diag">
+        <div class="zone-card__meta"><span>[ FILE 02 / 05 ]</span><b>// LOUNGE</b></div>
+        <div class="zone-card__body">
+          <span class="zone-card__tag">01 — About</span>
+          <h2 class="zone-card__title">Building with<br />craft and code</h2>
+          <p class="zone-card__text">I am a creative developer who bridges the gap between design systems and immersive frontend technology. I make digital interfaces feel responsive, tactile, and human.</p>
+          <p class="zone-card__text">I focus on GPU-accelerated graphics, fine-tuned typography, and rich physical motion — built on robust engineering and strict design principles.</p>
+          <p class="zone-card__hint">▸ Click the wall TV to open About_OS</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- 2 · STUDIO → Projects -->
+    <section class="panel panel--left" id="room-studio" aria-label="Studio — Projects">
+      <article class="zone-card with-dots with-diag">
+        <div class="zone-card__meta"><span>[ FILE 03 / 05 ]</span><b>// STUDIO</b></div>
+        <div class="zone-card__body">
+          <span class="zone-card__tag">02 — Projects</span>
+          <h2 class="zone-card__title">Selected Work</h2>
+          <div class="proj">
+            <span class="proj__no">01 / 02</span>
+            <h3 class="proj__name">3D Interactive Portfolio</h3>
+            <p class="proj__desc">An immersive WebGL portfolio with a motion-driven HUD interface, particle systems, and scroll-morphing 3D visuals.</p>
+            <div class="tags"><span class="tag">Three.js</span><span class="tag">WebGL</span><span class="tag">GSAP</span><span class="tag">JavaScript</span></div>
+            <a class="proj__link actionable" href="https://github.com/jvoclarit01/3d-Portfolio" target="_blank" rel="noopener noreferrer">View Source</a>
+          </div>
+          <div class="proj">
+            <span class="proj__no">02 / 02</span>
+            <h3 class="proj__name">PhishShield</h3>
+            <p class="proj__desc">A machine-learning phishing URL detector with SHAP-based explanations, single-URL and batch scanning, and a deep-scan mode.</p>
+            <div class="tags"><span class="tag">Machine Learning</span><span class="tag">Explainable AI</span><span class="tag">Security</span></div>
+            <a class="proj__link actionable" href="https://phishshield.pages.dev/" target="_blank" rel="noopener noreferrer">Visit Live</a>
+          </div>
+          <p class="zone-card__hint">▸ Click the desk monitor to open the showcase</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- 3 · GALLERY → Skills -->
+    <section class="panel panel--right" id="room-gallery" aria-label="Gallery — Skills">
+      <article class="zone-card with-dots with-diag">
+        <div class="zone-card__meta"><span>[ FILE 04 / 05 ]</span><b>// GALLERY</b></div>
+        <div class="zone-card__body">
+          <span class="zone-card__tag">03 — Skills</span>
+          <h2 class="zone-card__title">Stack &amp; Tooling</h2>
+          <p class="zone-card__text">The tech on the wall — what I build immersive, motion-rich interfaces with.</p>
+          <div class="skills">
+            <span>Three.js / WebGL</span>
+            <span>JavaScript / TS</span>
+            <span>React / Next.js</span>
+            <span>GSAP &amp; CSS Motion</span>
+            <span>HTML5 / CSS3</span>
+            <span>UI/UX &amp; Figma</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 4 · TERRACE → Connect -->
+    <section class="panel panel--left" id="room-terrace" aria-label="Terrace — Connect">
+      <article class="zone-card with-dots with-diag">
+        <div class="zone-card__meta"><span>[ FILE 05 / 05 ]</span><b>// TERRACE</b></div>
+        <div class="zone-card__body">
+          <span class="zone-card__tag">04 — Connect</span>
+          <h2 class="zone-card__title">Let&rsquo;s build something<br /><span class="grad">extraordinary</span></h2>
+          <p class="zone-card__text">I am always open to discussing new projects, collaborative ideas, or web engineering opportunities. Drop me a line.</p>
+          <a class="email-btn actionable" href="mailto:janvincentoclarit01@gmail.com">✉ janvincentoclarit01@gmail.com</a>
+          <div class="socials">
+            <a class="actionable" href="https://github.com/jvoclarit01" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a class="actionable" href="https://www.linkedin.com/in/jan-vincent-oclarit" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a class="actionable" href="https://www.upwork.com/freelancers/~0172cc238394e62987?mp_source=share" target="_blank" rel="noopener noreferrer">Upwork</a>
+          </div>
+          <p style="margin-top:20px;"><a class="card-link actionable" href="index.html">Back to the classic site</a></p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <!-- ============================ HUD CHROME ============================ -->
+  <div class="hud">
+    <div class="hud__top">
+      <span class="hud__brand" aria-hidden="true">JV <b>// STUDIO_OS</b></span>
+      <span class="hud__status">
+        <a class="hud__back actionable" href="index.html">Exit to site</a>
+        <span class="hud__rec" aria-hidden="true">REC</span>
+      </span>
+    </div>
+
+    <div class="hud__zone" aria-hidden="true">
+      <div class="hud__zone-idx" id="hud-zone-idx">01 / 05</div>
+      <div class="hud__zone-name" id="hud-zone-name">FOYER</div>
+      <div class="hud__coords" id="hud-coords">X   0.00  Y 0.00  Z 0.00</div>
+    </div>
+
+    <nav class="map" aria-label="Room navigation">
+      <button type="button" class="map__dot is-on" data-room="0" aria-label="Go to Foyer"><span>FOYER</span></button>
+      <button type="button" class="map__dot" data-room="1" aria-label="Go to Lounge"><span>LOUNGE</span></button>
+      <button type="button" class="map__dot" data-room="2" aria-label="Go to Studio"><span>STUDIO</span></button>
+      <button type="button" class="map__dot" data-room="3" aria-label="Go to Gallery"><span>GALLERY</span></button>
+      <button type="button" class="map__dot" data-room="4" aria-label="Go to Terrace"><span>TERRACE</span></button>
+    </nav>
+
+    <div class="rail" aria-hidden="true"><div class="rail__fill" id="hud-rail"></div></div>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        <div class="ticker__group">
+          <span><b>STUDIO_OS</b></span><i>◆</i><span>UNIT 01</span><i>◆</i><span>JAN VINCENT OCLARIT</span><i>◆</i><span>CREATIVE ENGINEER</span><i>◆</i><span>3D WEB DEVELOPER</span><i>◆</i><span>SCROLL TO EXPLORE</span><i>◆</i>
+        </div>
+        <div class="ticker__group">
+          <span><b>STUDIO_OS</b></span><i>◆</i><span>UNIT 01</span><i>◆</i><span>JAN VINCENT OCLARIT</span><i>◆</i><span>CREATIVE ENGINEER</span><i>◆</i><span>3D WEB DEVELOPER</span><i>◆</i><span>SCROLL TO EXPLORE</span><i>◆</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ PROJECT SHOWCASE OVERLAY ============================ -->
+  <div class="overlay project-overlay" id="project-overlay" role="dialog" aria-modal="true" aria-label="Project showcase">
+    <div class="overlay__backdrop" id="project-overlay-backdrop"></div>
+    <div class="overlay__panel">
+      <div class="overlay__head"><span>PROJECT_SHOWCASE <b>// 02 FILES</b></span><button type="button" class="overlay__close" id="project-overlay-close">Close ✕</button></div>
+      <div class="overlay__intro">
+        <h2 class="overlay__title">Selected Work</h2>
+        <p class="overlay__lead">Two builds from the desk — open a file to inspect the details.</p>
+      </div>
+      <div class="showcase">
+        <article class="showcase-item is-expanded">
+          <div class="showcase-item__header"><span class="showcase-item__no">01 / 02</span><span class="showcase-item__name">3D Interactive Portfolio</span><span class="showcase-item__plus" aria-hidden="true">+</span></div>
+          <div class="showcase-item__body">
+            <div class="showcase-item__inner">
+              <img class="showcase-item__shot" src="images/proj-portfolio.webp" alt="Screenshot of the 3D Interactive Portfolio website" loading="lazy" decoding="async" />
+              <div>
+                <p class="showcase-item__desc">An immersive WebGL portfolio with a motion-driven HUD interface, particle systems, and scroll-morphing 3D visuals — the very system this apartment is built on.</p>
+                <div class="tags"><span class="tag">Three.js</span><span class="tag">WebGL</span><span class="tag">GSAP</span><span class="tag">JavaScript</span></div>
+                <a class="actionable" href="https://github.com/jvoclarit01/3d-Portfolio" target="_blank" rel="noopener noreferrer">View Source</a>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="showcase-item">
+          <div class="showcase-item__header"><span class="showcase-item__no">02 / 02</span><span class="showcase-item__name">PhishShield</span><span class="showcase-item__plus" aria-hidden="true">+</span></div>
+          <div class="showcase-item__body">
+            <div class="showcase-item__inner">
+              <img class="showcase-item__shot" src="images/proj-phishshield.webp" alt="Screenshot of the PhishShield phishing detector" loading="lazy" decoding="async" />
+              <div>
+                <p class="showcase-item__desc">A machine-learning phishing URL detector with SHAP-based explanations, single-URL and batch scanning, and a deep-scan mode — flagging fraudulent sites before they strike.</p>
+                <div class="tags"><span class="tag">Machine Learning</span><span class="tag">Explainable AI</span><span class="tag">Security</span><span class="tag">Web App</span></div>
+                <a class="actionable" href="https://phishshield.pages.dev/" target="_blank" rel="noopener noreferrer">Visit Live</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ ABOUT OS OVERLAY ============================ -->
+  <div class="overlay project-overlay" id="about-overlay" role="dialog" aria-modal="true" aria-label="About">
+    <div class="overlay__backdrop" id="about-overlay-backdrop"></div>
+    <div class="overlay__panel">
+      <div class="overlay__head"><span>ABOUT_OS <b>// UNIT 01</b></span><button type="button" class="overlay__close" id="about-overlay-close">Close ✕</button></div>
+      <div class="overlay__intro">
+        <h2 class="overlay__title">Jan Vincent Oclarit</h2>
+        <p class="overlay__lead">Creative Engineer &amp; 3D Web Developer</p>
+      </div>
+      <div class="about-os">
+        <div class="about-os__row">
+          <img class="about-os__avatar" src="images/profile.png" alt="Jan Vincent Oclarit" loading="lazy" decoding="async" />
+          <div>
+            <p class="about-os__p">I am a creative developer who bridges the gap between design systems and immersive frontend technology. I make digital interfaces feel responsive, tactile, and human.</p>
+            <p class="about-os__p">I focus on GPU-accelerated graphics, fine-tuned typography, and rich physical motion. My work is built on robust engineering and strict design principles.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/apartment.js"></script>
+</body>
+</html>
