@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jan Vincent Oclarit — 16-Bit RPG Portfolio Room</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #121214;
+      --panel: #1a1a1e;
+      --text: #eeece8;
+      --accent: #cca37a; /* Warm Oak */
+      --accent-dark: #9a724d; /* Bronze */
+      --border: rgba(255, 255, 255, 0.08);
+      --font-sans: "Inter", sans-serif;
+      --font-mono: "JetBrains Mono", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    /* Screen Bezel Container (CRT/Arcade Cabinet styling) */
+    .arcade-cabinet {
+      position: relative;
+      background: var(--panel);
+      border: 4px solid #2d2d30;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 
+        0 30px 70px rgba(0, 0, 0, 0.6), 
+        inset 0 0 30px rgba(204, 163, 122, 0.08),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .arcade-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+    }
+    .arcade-header h1 {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .arcade-header .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .arcade-header .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #3d7a5a;
+      box-shadow: 0 0 8px #3d7a5a;
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Game Screen Frame */
+    .screen-frame {
+      position: relative;
+      border: 6px solid #111;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0,0,0,0.8);
+      background: #000;
+    }
+
+    /* Retro Screen Shaders (Scanlines, Vignette) */
+    .screen-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        radial-gradient(circle, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
+      background-size: 100% 4px, 100% 100%;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Controls Instruction Sheet */
+    .arcade-instructions {
+      width: 100%;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.75rem;
+      color: #8a8e98;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      font-family: var(--font-mono);
+    }
+    .key-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .key-cap {
+      background: #2d2d30;
+      border: 1px solid #4a4a4f;
+      border-radius: 4px;
+      padding: 2px 8px;
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 2px 0 #111;
+    }
+
+    .exit-btn {
+      margin-top: 24px;
+      background: none;
+      border: 1px solid var(--border);
+      padding: 10px 20px;
+      color: #8a8e98;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    .exit-btn:hover {
+      border-color: var(--accent);
+      color: #fff;
+      background: rgba(204, 163, 122, 0.05);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="arcade-cabinet">
+    <div class="arcade-header">
+      <h1>UNIT_01 // 16-BIT_EXPLORER</h1>
+      <div class="status">
+        <span class="status-dot"></span>
+        <span>AWAITING INPUT</span>
+      </div>
+    </div>
+
+    <div class="screen-frame">
+      <canvas id="gameCanvas" width="768" height="528"></canvas>
+    </div>
+
+    <div class="arcade-instructions">
+      <div class="key-hint">
+        <span class="key-cap">▲</span><span class="key-cap">▼</span><span class="key-cap">◀</span><span class="key-cap">▶</span> / <span class="key-cap">W</span><span class="key-cap">A</span><span class="key-cap">S</span><span class="key-cap">D</span>
+        <span>Move Explorer</span>
+      </div>
+      <div class="key-hint">
+        <span class="key-cap">E</span> / <span class="key-cap">Space</span>
+        <span>Inspect Object</span>
+      </div>
+      <div class="key-hint">
+        <span class="key-cap">Enter</span>
+        <span>Action / Open Link</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="exit-btn" onclick="window.location.href='apartment.html'">← BACK TO 3D APARTMENT</button>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Grid details
+    const TILE_SIZE = 48;
+    const COLS = 16; // 768px wide
+    const ROWS = 11; // 528px high
+
+    // Game state
+    let player = {
+      x: 8 * TILE_SIZE,
+      y: 8 * TILE_SIZE,
+      targetX: 8 * TILE_SIZE,
+      targetY: 8 * TILE_SIZE,
+      dir: "down", // "up", "down", "left", "right"
+      isMoving: false,
+      moveSpeed: 3, // speed divider
+      animFrame: 0,
+      animTimer: 0
+    };
+
+    let activeDialogue = null;
+    let dialogueTextIndex = 0;
+    let dialogueTimer = 0;
+    let currentInteractingObj = null;
+
+    // Grid collisions map (1 = obstacle, 0 = walkthrough)
+    // Layout representing our studio:
+    // Left side: Kitchen counter + bed loft
+    // Back side: bookshelf/plaque screen + desk PC
+    // Center-left: couch and TV
+    // Bottom: Door
+    const collisionGrid = [
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // Wall / ceiling boundary
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], // Shelf wall base
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,1], // Kitchen cabinets (left) & Bed platform (right)
+      [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1], // Sofa / Lounge
+      [1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1]  // Bottom walls (entrance gap)
+    ];
+
+    // Interactive objects lists
+    const interactives = [
+      {
+        name: "Desk & curved PC",
+        x: 8, y: 1, // trigger coordinate (adjacent facing check)
+        check: (px, py, pdir) => (px === 8 && py === 2 && pdir === "up"),
+        title: "🖥️ WORKSPACE // PC_UNIT_01",
+        lines: [
+          "Curved Monitor displays active coding terminal: showcase.sh",
+          "Selected Projects loaded:",
+          "1. 3D Spatial Studio Portfolio [Three.js, WebGL, GSAP]",
+          "2. PhishShield AI [XGBoost ML URL Security Explainer]",
+          "",
+          "[Press ENTER to open Project Showcase Source Code]"
+        ],
+        action: () => {
+          window.open("https://github.com/jvoclarit01/3d-Portfolio", "_blank");
+        }
+      },
+      {
+        name: "Bookshelf & Skills",
+        x: 3, y: 1,
+        check: (px, py, pdir) => (px === 3 && py === 2 && pdir === "up"),
+        title: "📚 BOOKSHELF // COGNITIVE_PLAQUES",
+        lines: [
+          "Plaques detailing creative engineering skill-stack:",
+          "• Three.js / WebGL / Spatial GPU Physics",
+          "• TypeScript / React / Next.js Core Systems",
+          "• GSAP Motion / CSS Engineering / Figma UI Design",
+          "• Python / ML Cyber Security Classifiers"
+        ]
+      },
+      {
+        name: "Framed photo & Mirror",
+        x: 13, y: 1,
+        check: (px, py, pdir) => (px === 13 && py === 2 && pdir === "up"),
+        title: "🖼️ FRAMED ART // JAN_VINCENT_O",
+        lines: [
+          "An abstract geometric print overlayed with blueprint lines.",
+          "It frames biography details:",
+          "• Role: Creative Web Engineer & Front-End developer.",
+          "• Focus: Bridging math graphics & responsive visual tactile spaces.",
+          "• Philosophy: Make software feel alive and satisfying to touch."
+        ]
+      },
+      {
+        name: "Modular Couch & TV",
+        x: 3, y: 7,
+        check: (px, py, pdir) => (
+          (px === 2 && py === 7 && pdir === "right") ||
+          (px === 3 && py === 6 && pdir === "down") ||
+          (px === 4 && py === 7 && pdir === "left")
+        ),
+        title: "🛋️ SUNKEN LOUNGE // TV_FRAME",
+        lines: [
+          "A cream modular bouclé sofa wrapped around an oak table.",
+          "TV Screen displays retro spatial greeting:",
+          "\"Welcome to Unit 01 - An interactive explore engine.\"",
+          "Relax and feel the 16-bit cozy morning vibe."
+        ]
+      },
+      {
+        name: "Balcony Door & Mat",
+        x: 8, y: 10,
+        check: (px, py, pdir) => (px === 8 && py === 9 && pdir === "down"),
+        title: "🚪 TERRACE EXIT // CONNECT_PORT",
+        lines: [
+          "The sliding glass door leads to a misty morning terrace.",
+          "A welcome mat reads details to connect with Jan:",
+          "• Email: janvincentoclarit01@gmail.com",
+          "• Network: GitHub // LinkedIn // Upwork",
+          "",
+          "[Press ENTER to send a message]"
+        ],
+        action: () => {
+          window.location.href = "mailto:janvincentoclarit01@gmail.com";
+        }
+      }
+    ];
+
+    // Inputs queue
+    const keys = {};
+    window.addEventListener("keydown", (e) => {
+      keys[e.key.toLowerCase()] = true;
+      
+      // Prevent browser scrolls on arrows / space
+      if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "e", "enter"].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+
+      if (activeDialogue) {
+        // Dialogue inputs
+        if (e.key === "Enter" || e.key === "e" || e.key === " ") {
+          // If text not fully written, print it all instantly
+          const targetText = currentInteractingObj.lines.join("\n");
+          if (dialogueTextIndex < targetText.length) {
+            dialogueTextIndex = targetText.length;
+          } else {
+            // If fully written, execute actions or close
+            if (e.key === "Enter" && currentInteractingObj.action) {
+              currentInteractingObj.action();
+            }
+            activeDialogue = null;
+            currentInteractingObj = null;
+          }
+        }
+      } else {
+        // Map exploration inputs
+        if (e.key === "e" || e.key === " ") {
+          checkInteraction();
+        }
+      }
+    });
+
+    window.addEventListener("keyup", (e) => {
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    function checkInteraction() {
+      const px = Math.floor(player.x / TILE_SIZE);
+      const py = Math.floor(player.y / TILE_SIZE);
+      
+      for (const obj of interactives) {
+        if (obj.check(px, py, player.dir)) {
+          activeDialogue = obj.title;
+          dialogueTextIndex = 0;
+          currentInteractingObj = obj;
+          break;
+        }
+      }
+    }
+
+    // Grid movement loop
+    function updatePlayer() {
+      if (activeDialogue) return; // Freeze walking during speech
+
+      if (!player.isMoving) {
+        let dx = 0;
+        let dy = 0;
+
+        if (keys["w"] || keys["arrowup"]) { dy = -1; player.dir = "up"; }
+        else if (keys["s"] || keys["arrowdown"]) { dy = 1; player.dir = "down"; }
+        else if (keys["a"] || keys["arrowleft"]) { dx = -1; player.dir = "left"; }
+        else if (keys["d"] || keys["arrowright"]) { dx = 1; player.dir = "right"; }
+
+        if (dx !== 0 || dy !== 0) {
+          const nextGridX = Math.floor(player.x / TILE_SIZE) + dx;
+          const nextGridY = Math.floor(player.y / TILE_SIZE) + dy;
+
+          // Out of bounds check
+          if (nextGridX >= 0 && nextGridX < COLS && nextGridY >= 0 && nextGridY < ROWS) {
+            // Collision grid check
+            if (collisionGrid[nextGridY][nextGridX] === 0) {
+              player.targetX = nextGridX * TILE_SIZE;
+              player.targetY = nextGridY * TILE_SIZE;
+              player.isMoving = true;
+            }
+          }
+        }
+      }
+
+      // Interpolation to target cell
+      if (player.isMoving) {
+        const stepX = (player.targetX - player.x) / player.moveSpeed;
+        const stepY = (player.targetY - player.y) / player.moveSpeed;
+        
+        player.x += stepX;
+        player.y += stepY;
+
+        // Walking leg cycles
+        player.animTimer++;
+        if (player.animTimer > 6) {
+          player.animFrame = (player.animFrame + 1) % 4;
+          player.animTimer = 0;
+        }
+
+        // Close enough check to snap grid
+        if (Math.abs(player.x - player.targetX) < 1 && Math.abs(player.y - player.targetY) < 1) {
+          player.x = player.targetX;
+          player.y = player.targetY;
+          player.isMoving = false;
+          player.animFrame = 0;
+        }
+      }
+    }
+
+    // Procedural pixel graphics rendering helpers
+    function drawFloor(ctx) {
+      // Wood plank floorboards (Scandinavian light bleached oak)
+      for (let r = 2; r < ROWS - 1; r++) {
+        for (let c = 1; c < COLS - 1; c++) {
+          const x = c * TILE_SIZE;
+          const y = r * TILE_SIZE;
+          
+          // Stepped Sunken lounge floors (darker / rug color in grid cells 3,4,6,7)
+          const isLounge = (c >= 2 && c <= 5 && r >= 6 && r <= 8);
+          
+          if (isLounge) {
+            // Large Rug pattern
+            ctx.fillStyle = "#eae6e0"; // Soft cream
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            // Rug grid pattern borders
+            ctx.strokeStyle = "rgba(45,45,48,0.06)";
+            ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+          } else {
+            // Bleached Oak wood plank
+            ctx.fillStyle = "#e6e2db";
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            // Drawing floor seams
+            ctx.strokeStyle = "#dbd7d0";
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + TILE_SIZE, y);
+            ctx.stroke();
+            // Wood grains representation
+            ctx.strokeStyle = "#ede9e2";
+            ctx.beginPath();
+            ctx.moveTo(x + 10, y + 16);
+            ctx.lineTo(x + 36, y + 16);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function drawWalls(ctx) {
+      // Back plaster wall (ROWS 0 and 1)
+      ctx.fillStyle = "#eeece8";
+      ctx.fillRect(0, 0, canvas.width, 2 * TILE_SIZE);
+      
+      // Dark Baseboards
+      ctx.fillStyle = "#cca37a"; // Oak molding
+      ctx.fillRect(0, 2 * TILE_SIZE - 8, canvas.width, 8);
+      
+      // Side Walls
+      ctx.fillStyle = "#e1ded9";
+      ctx.fillRect(0, 2 * TILE_SIZE, TILE_SIZE, canvas.height - 3 * TILE_SIZE);
+      ctx.fillRect(canvas.width - TILE_SIZE, 2 * TILE_SIZE, TILE_SIZE, canvas.height - 3 * TILE_SIZE);
+
+      // Bottom walls frame with entrance door gap
+      ctx.fillStyle = "#eeece8";
+      ctx.fillRect(0, canvas.height - TILE_SIZE, 8 * TILE_SIZE, TILE_SIZE);
+      ctx.fillRect(9 * TILE_SIZE, canvas.height - TILE_SIZE, 7 * TILE_SIZE, TILE_SIZE);
+      ctx.fillStyle = "#cca37a";
+      ctx.fillRect(0, canvas.height - TILE_SIZE, canvas.width, 4);
+
+      // Entrance welcome door mat (Foyer at columns 8)
+      ctx.fillStyle = "#f5f3ef";
+      ctx.fillRect(8 * TILE_SIZE + 4, canvas.height - TILE_SIZE - 12, TILE_SIZE - 8, 12);
+      ctx.strokeStyle = "#cca37a";
+      ctx.strokeRect(8 * TILE_SIZE + 4, canvas.height - TILE_SIZE - 12, TILE_SIZE - 8, 12);
+      ctx.font = "bold 9px monospace";
+      ctx.fillStyle = "#cca37a";
+      ctx.textAlign = "center";
+      ctx.fillText("HELLO", 8 * TILE_SIZE + 24, canvas.height - TILE_SIZE - 3);
+    }
+
+    function drawFurniture(ctx) {
+      // 1. Bookshelf (Plaque Skills screen) at grid x=2,3,4, y=1
+      ctx.fillStyle = "#9a724d"; // Dark Bronze oak
+      ctx.fillRect(2 * TILE_SIZE + 8, 1.2 * TILE_SIZE, 3 * TILE_SIZE - 16, 0.8 * TILE_SIZE);
+      // Technical plaques representing skills
+      ctx.fillStyle = "#cca37a";
+      ctx.fillRect(2 * TILE_SIZE + 14, 1.35 * TILE_SIZE, 24, 16);
+      ctx.fillRect(3 * TILE_SIZE + 6, 1.35 * TILE_SIZE, 24, 16);
+      ctx.fillRect(4 * TILE_SIZE - 2, 1.35 * TILE_SIZE, 24, 16);
+      // Small plant next to shelf
+      ctx.fillStyle = "#b8b6b0";
+      ctx.fillRect(1.4 * TILE_SIZE, 1.4 * TILE_SIZE, 16, 20); // pot
+      ctx.fillStyle = "#4d594b";
+      ctx.beginPath();
+      ctx.arc(1.4 * TILE_SIZE + 8, 1.2 * TILE_SIZE, 12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Desk + curved wide Monitor at grid x=7,8,9, y=1
+      ctx.fillStyle = "#202022"; // Charcoal desk
+      ctx.fillRect(7 * TILE_SIZE + 12, 1.3 * TILE_SIZE, 3 * TILE_SIZE - 24, 0.7 * TILE_SIZE);
+      // Legs
+      ctx.fillStyle = "#202022";
+      ctx.fillRect(7 * TILE_SIZE + 16, 2 * TILE_SIZE, 6, 8);
+      ctx.fillRect(10 * TILE_SIZE - 22, 2 * TILE_SIZE, 6, 8);
+      // Curved monitor (programmatic visual)
+      ctx.fillStyle = "#FAF9F8"; // Light IDE screen background
+      ctx.fillRect(8 * TILE_SIZE + 2, 1.4 * TILE_SIZE, 44, 20);
+      ctx.strokeStyle = "#cca37a"; // Oak highlight
+      ctx.strokeRect(8 * TILE_SIZE + 2, 1.4 * TILE_SIZE, 44, 20);
+      // Green code lines
+      ctx.fillStyle = "#3d7a5a";
+      ctx.fillRect(8 * TILE_SIZE + 6, 1.5 * TILE_SIZE, 36, 3);
+      ctx.fillRect(8 * TILE_SIZE + 6, 1.62 * TILE_SIZE, 24, 3);
+
+      // 3. Framed Art picture / Mirror at grid x=13, y=1
+      ctx.fillStyle = "#cca37a";
+      ctx.fillRect(13 * TILE_SIZE + 10, 1.2 * TILE_SIZE, 28, 30);
+      ctx.fillStyle = "#eeece8";
+      ctx.fillRect(13 * TILE_SIZE + 14, 1.3 * TILE_SIZE, 20, 22);
+      ctx.fillStyle = "#202022";
+      ctx.fillRect(13 * TILE_SIZE + 18, 1.45 * TILE_SIZE, 12, 12); // Art print
+
+      // 4. Couch modular lounge at grid x=2,3, y=7
+      ctx.fillStyle = "#f5f3ef"; // Cream couch material
+      ctx.fillRect(2 * TILE_SIZE, 6.8 * TILE_SIZE, 1.8 * TILE_SIZE, 1.4 * TILE_SIZE); // Sofa L section
+      ctx.fillStyle = "#dbd7d0";
+      ctx.fillRect(2 * TILE_SIZE, 6.8 * TILE_SIZE, 0.4 * TILE_SIZE, 1.4 * TILE_SIZE); // Backrest
+      // Lounge round coffee table
+      ctx.fillStyle = "#cca37a";
+      ctx.beginPath();
+      ctx.arc(4 * TILE_SIZE, 7.5 * TILE_SIZE, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 5. Sleeping bed loft platform at grid x=13,14, y=4
+      ctx.fillStyle = "#e6e2db"; // Loft floor
+      ctx.fillRect(12 * TILE_SIZE + 12, 3.2 * TILE_SIZE, 2.5 * TILE_SIZE, 1.8 * TILE_SIZE);
+      // Loft steps/ladder
+      ctx.fillStyle = "#9a724d";
+      ctx.fillRect(12 * TILE_SIZE, 3.2 * TILE_SIZE, 8, 1.8 * TILE_SIZE);
+      for (let steps = 0.2; steps < 1.8; steps += 0.3) {
+        ctx.fillRect(12 * TILE_SIZE, 3.2 * TILE_SIZE + steps * TILE_SIZE, 8, 4);
+      }
+      // Cozy bed linens
+      ctx.fillStyle = "#f5f3ef"; // White mattress
+      ctx.fillRect(13.2 * TILE_SIZE, 3.4 * TILE_SIZE, 1.5 * TILE_SIZE, 1.2 * TILE_SIZE);
+      ctx.fillStyle = "#6e7282"; // Grey sheets
+      ctx.fillRect(14 * TILE_SIZE, 3.4 * TILE_SIZE, 0.7 * TILE_SIZE, 1.2 * TILE_SIZE);
+      ctx.fillStyle = "#cca37a"; // Pillows
+      ctx.fillRect(13.3 * TILE_SIZE, 3.6 * TILE_SIZE, 12, 18);
+      ctx.fillRect(13.3 * TILE_SIZE, 4.2 * TILE_SIZE, 12, 18);
+    }
+
+    // Cute retro pixel-art character generator
+    function drawPlayer(ctx) {
+      const px = player.x;
+      const py = player.y;
+
+      // Leg cycling offsets for walking animation
+      let stepOffset = 0;
+      if (player.isMoving) {
+        stepOffset = (player.animFrame % 2 === 0) ? -3 : 3;
+      }
+
+      // Shadow under character
+      ctx.fillStyle = "rgba(0, 0, 0, 0.18)";
+      ctx.beginPath();
+      ctx.ellipse(px + TILE_SIZE/2, py + TILE_SIZE - 4, 14, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Explorer Sprite
+      if (player.dir === "down") {
+        // Feet
+        ctx.fillStyle = "#202022";
+        ctx.fillRect(px + 12, py + TILE_SIZE - 6 + stepOffset, 6, 6);
+        ctx.fillRect(px + 30, py + TILE_SIZE - 6 - stepOffset, 6, 6);
+        
+        // Pants (Charcoal)
+        ctx.fillStyle = "#2d2d30";
+        ctx.fillRect(px + 12, py + TILE_SIZE - 12, 24, 6);
+        
+        // Shirt (Warm Oak Gold)
+        ctx.fillStyle = "#cca37a";
+        ctx.fillRect(px + 10, py + TILE_SIZE - 28, 28, 16);
+        
+        // Head / Skin (Tan/Beige)
+        ctx.fillStyle = "#ecd9cc";
+        ctx.fillRect(px + 14, py + 8, 20, 12);
+        
+        // Hair (Charcoal brown block)
+        ctx.fillStyle = "#3c2e28";
+        ctx.fillRect(px + 12, py + 2, 24, 8);
+        ctx.fillRect(px + 10, py + 6, 4, 8);
+        ctx.fillRect(px + 34, py + 6, 4, 8);
+
+        // Eyes (pixel blocks)
+        ctx.fillStyle = "#202022";
+        ctx.fillRect(px + 18, py + 12, 2, 3);
+        ctx.fillRect(px + 28, py + 12, 2, 3);
+      } 
+      else if (player.dir === "up") {
+        // Feet
+        ctx.fillStyle = "#202022";
+        ctx.fillRect(px + 12, py + TILE_SIZE - 6 + stepOffset, 6, 6);
+        ctx.fillRect(px + 30, py + TILE_SIZE - 6 - stepOffset, 6, 6);
+        
+        // Pants
+        ctx.fillStyle = "#2d2d30";
+        ctx.fillRect(px + 12, py + TILE_SIZE - 12, 24, 6);
+        
+        // Shirt
+        ctx.fillStyle = "#cca37a";
+        ctx.fillRect(px + 10, py + TILE_SIZE - 28, 28, 16);
+        
+        // Back of head Hair (Covering skin)
+        ctx.fillStyle = "#3c2e28";
+        ctx.fillRect(px + 12, py + 4, 24, 18);
+      } 
+      else if (player.dir === "left") {
+        // Feet
+        ctx.fillStyle = "#202022";
+        ctx.fillRect(px + 14 + stepOffset, py + TILE_SIZE - 6, 6, 6);
+        ctx.fillRect(px + 26 - stepOffset, py + TILE_SIZE - 6, 6, 6);
+        
+        // Pants
+        ctx.fillStyle = "#2d2d30";
+        ctx.fillRect(px + 14, py + TILE_SIZE - 12, 18, 6);
+        
+        // Shirt
+        ctx.fillStyle = "#cca37a";
+        ctx.fillRect(px + 12, py + TILE_SIZE - 28, 22, 16);
+        
+        // Head / Skin
+        ctx.fillStyle = "#ecd9cc";
+        ctx.fillRect(px + 14, py + 8, 18, 12);
+        
+        // Side hair
+        ctx.fillStyle = "#3c2e28";
+        ctx.fillRect(px + 14, py + 2, 20, 8);
+        ctx.fillRect(px + 22, py + 4, 12, 14); // side bang
+
+        // Eye
+        ctx.fillStyle = "#202022";
+        ctx.fillRect(px + 18, py + 12, 2, 3);
+      } 
+      else if (player.dir === "right") {
+        // Feet
+        ctx.fillStyle = "#202022";
+        ctx.fillRect(px + 16 + stepOffset, py + TILE_SIZE - 6, 6, 6);
+        ctx.fillRect(px + 28 - stepOffset, py + TILE_SIZE - 6, 6, 6);
+        
+        // Pants
+        ctx.fillStyle = "#2d2d30";
+        ctx.fillRect(px + 16, py + TILE_SIZE - 12, 18, 6);
+        
+        // Shirt
+        ctx.fillStyle = "#cca37a";
+        ctx.fillRect(px + 14, py + TILE_SIZE - 28, 22, 16);
+        
+        // Head / Skin
+        ctx.fillStyle = "#ecd9cc";
+        ctx.fillRect(px + 16, py + 8, 18, 12);
+        
+        // Side hair
+        ctx.fillStyle = "#3c2e28";
+        ctx.fillRect(px + 14, py + 2, 20, 8);
+        ctx.fillRect(px + 14, py + 4, 12, 14); // side bang
+
+        // Eye
+        ctx.fillStyle = "#202022";
+        ctx.fillRect(px + 28, py + 12, 2, 3);
+      }
+    }
+
+    // Render interactive HUD prompts ("Press E to inspect")
+    function drawActionPrompts(ctx) {
+      if (activeDialogue) return;
+
+      const px = Math.floor(player.x / TILE_SIZE);
+      const py = Math.floor(player.y / TILE_SIZE);
+      
+      for (const obj of interactives) {
+        if (obj.check(px, py, player.dir)) {
+          // Centered above player head
+          const rx = player.x + TILE_SIZE / 2;
+          const ry = player.y - 18;
+          
+          ctx.fillStyle = "rgba(26, 26, 30, 0.88)";
+          ctx.strokeStyle = "var(--accent)";
+          ctx.lineWidth = 1;
+          
+          ctx.beginPath();
+          ctx.roundRect(rx - 70, ry - 14, 140, 24, 4);
+          ctx.fill();
+          ctx.stroke();
+          
+          ctx.font = "bold 9px 'JetBrains Mono', monospace";
+          ctx.fillStyle = "#fff";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("PRESS [E] TO INSPECT", rx, ry - 2);
+          break;
+        }
+      }
+    }
+
+    // Dialogue text rendering (Typewriter style dialogue)
+    function drawDialogue(ctx) {
+      if (!activeDialogue || !currentInteractingObj) return;
+
+      const cardW = canvas.width - 64;
+      const cardH = 140;
+      const cardX = 32;
+      const cardY = canvas.height - cardH - 32;
+
+      // Card Border & frosted plate
+      ctx.fillStyle = "rgba(10, 10, 12, 0.94)";
+      ctx.strokeStyle = "var(--accent)";
+      ctx.lineWidth = 3;
+      
+      ctx.beginPath();
+      ctx.roundRect(cardX, cardY, cardW, cardH, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Double line retro border detail
+      ctx.strokeStyle = "rgba(204, 163, 122, 0.3)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(cardX + 6, cardY + 6, cardW - 12, cardH - 12, 4);
+      ctx.stroke();
+
+      // Dialogue Title Header
+      ctx.font = "bold 11px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "var(--accent)";
+      ctx.textAlign = "left";
+      ctx.fillText(activeDialogue, cardX + 24, cardY + 26);
+
+      // Typewriter ticking speed
+      dialogueTimer++;
+      const fullText = currentInteractingObj.lines.join("\n");
+      if (dialogueTimer > 1 && dialogueTextIndex < fullText.length) {
+        dialogueTextIndex++;
+        dialogueTimer = 0;
+      }
+
+      // Draw currently written strings
+      const writtenText = fullText.slice(0, dialogueTextIndex);
+      const paragraphs = writtenText.split("\n");
+      
+      ctx.font = "12px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "#eae6e0";
+      paragraphs.forEach((line, i) => {
+        ctx.fillText(line, cardX + 24, cardY + 54 + i * 18);
+      });
+
+      // Show action arrows / log cues when text completes writing
+      if (dialogueTextIndex === fullText.length) {
+        ctx.font = "9px 'JetBrains Mono', monospace";
+        ctx.fillStyle = "#8a8e98";
+        ctx.textAlign = "right";
+        ctx.fillText("PRESS [E] OR [SPACE] TO CLOSE ▾", cardX + cardW - 24, cardY + cardH - 18);
+      }
+    }
+
+    // Main Game Loop
+    function gameLoop() {
+      // 1. Process walking positioning logic
+      updatePlayer();
+
+      // 2. Render stages
+      ctx.fillStyle = "#0d0e1a"; // dark space border
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawFloor(ctx);
+      drawWalls(ctx);
+      drawFurniture(ctx);
+      drawPlayer(ctx);
+      drawActionPrompts(ctx);
+      drawDialogue(ctx);
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Run explorer
+    gameLoop();
+  </script>
+</body>
+</html>

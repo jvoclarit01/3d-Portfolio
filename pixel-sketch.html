@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JV.STUDIO — pixel sketch</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: #11101a; overflow: hidden; }
+  body { display: grid; place-items: center; font-family: "JetBrains Mono", ui-monospace, monospace; }
+  #stage { position: relative; }
+  canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; box-shadow: 0 20px 80px rgba(0,0,0,.6); }
+  .hint { position: absolute; left: 0; right: 0; top: -34px; text-align: center; color: #8a8ea8; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+  .hint b { color: #ffd166; font-weight: 400; }
+  .badge { position: absolute; left: 0; bottom: -30px; color: #565a76; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div class="hint">JV.STUDIO &nbsp;·&nbsp; <b>◄ ► ▲ ▼</b> move &nbsp;·&nbsp; <b>E</b> interact &nbsp;·&nbsp; <b>ESC</b> close</div>
+    <canvas id="game"></canvas>
+    <div class="badge">// throwaway pixel sketch — feel the vibe, not the polish</div>
+  </div>
+
+<script>
+"use strict";
+// ---------- internal pixel resolution ----------
+const TILE = 16, COLS = 19, ROWS = 12;
+const W = COLS * TILE, H = ROWS * TILE;        // 304 x 192 internal
+const SCALE = Math.max(2, Math.min(5, Math.floor((Math.min(window.innerWidth, 1100) ) / W)));
+const cv = document.getElementById("game");
+cv.width = W; cv.height = H;
+cv.style.width = (W * SCALE) + "px"; cv.style.height = (H * SCALE) + "px";
+const ctx = cv.getContext("2d");
+ctx.imageSmoothingEnabled = false;
+
+// ---------- cozy 16-bit palette ----------
+const P = {
+  floorA:"#7a5230", floorB:"#6b481f", floorLine:"#5b3d1c",
+  wall:"#403a59", wallHi:"#4c4668", wallTrim:"#2c2840", skirt:"#332e49",
+  rug1:"#a8324f", rug2:"#6c2f86",
+  wood:"#8a5a34", woodDk:"#5e3b22", metal:"#9aa0b5", metalDk:"#5b6070",
+  screen:"#16e0e6", screen2:"#ff3d8b", glow:"#bff7ff",
+  leaf:"#3fa34d", leafDk:"#2c7d3a", pot:"#c1672a",
+  book1:"#16e0e6", book2:"#ff3d8b", book3:"#a86bff", book4:"#ffd166", book5:"#ef6b6b",
+  skin:"#eab690", hair:"#241d33", shirt:"#ff2d6f", shirtDk:"#c41e57", pants:"#2c3a66", shoe:"#1c1726",
+  frame:"#caa15a", photo:"#2a2740",
+  white:"#eef0ff", ink:"#161425", shadow:"rgba(0,0,0,.22)",
+};
+function px(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(x|0,y|0,w|0,h|0); }
+
+// ---------- room: tilemap ----------
+// '#'=wall  '.'=floor  rest are floor (props drawn separately)
+const MAP = [
+"###################",
+"###################",
+"#.................#",
+"#.................#",
+"#.................#",
+"#.................#",
+"#.................#",
+"#.................#",
+"#.................#",
+"#.................#",
+"#........door.....#",
+"###################",
+].map(r=>r.split(""));
+function isWall(c,r){ return r<0||c<0||r>=ROWS||c>=COLS || MAP[r][c]==="#"; }
+
+// ---------- interactables (footprint in tiles + an "in front" zone) ----------
+// each: {x,y,w,h} footprint (blocks), face = tile player stands to interact
+const SPOTS = [
+  { id:"PROJECTS", color:"#16e0e6", tx:3,  ty:2, draw:drawDesk,     foot:{x:3,y:2,w:3,h:2}, face:{x:4,y:4},
+    title:"PROJECTS // 02 FILES",
+    body:["3D Interactive Portfolio — immersive WebGL site","with a motion-driven HUD + particle systems.","","PhishShield — ML phishing URL detector with","SHAP explanations & batch scanning."] },
+  { id:"SKILLS", color:"#a86bff", tx:8, ty:2, draw:drawShelf,   foot:{x:8,y:2,w:3,h:2}, face:{x:9,y:4},
+    title:"SKILLS & STACK",
+    body:["Three.js / WebGL    JavaScript / TS","React / Next.js     GSAP & CSS Motion","HTML5 / CSS3        UI/UX & Figma"] },
+  { id:"ABOUT", color:"#ffd166", tx:14, ty:2, draw:drawPhoto,  foot:{x:14,y:2,w:2,h:1}, face:{x:14,y:4},
+    title:"ABOUT // JAN VINCENT OCLARIT",
+    body:["Creative Engineer & 3D Web Developer.","A driven builder with a curious mind for","technology and design — blending logical","problem-solving with creative expression."] },
+  { id:"HOME", color:"#ff3d8b", tx:14, ty:7, draw:drawCouch,  foot:{x:14,y:7,w:3,h:2}, face:{x:15,y:6},
+    title:"WELCOME // UNIT 01",
+    body:["This is my studio. Walk around and press E","at the desk, shelf, photo, or door to explore.","","Built as a playable pixel portfolio."] },
+  { id:"CONNECT", color:"#16e0e6", tx:9, ty:10, draw:drawDoor, foot:{x:9,y:10,w:2,h:1}, face:{x:9,y:9},
+    title:"CONNECT",
+    body:["Let's build something extraordinary.","","janvincentoclarit01@gmail.com","GitHub · LinkedIn · Upwork"] },
+];
+// mark footprints as blocked
+const BLOCK = {};
+SPOTS.forEach(s=>{ for(let y=0;y<s.foot.h;y++) for(let x=0;x<s.foot.w;x++) BLOCK[(s.foot.x+x)+","+(s.foot.y+y)]=1; });
+function blocked(c,r){ return isWall(c,r) || BLOCK[c+","+r]===1; }
+
+// ---------- player ----------
+const player = { x: 9*TILE+2, y: 7*TILE, w: 10, h: 12, spd: 1.1, dir:"down", step:0, moving:false };
+const keys = {};
+addEventListener("keydown", e=>{
+  if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)) e.preventDefault();
+  keys[e.key.toLowerCase()] = true;
+  if(e.key.toLowerCase()==="e"||e.key===" ") tryInteract();
+  if(e.key==="Escape") dialog=null;
+});
+addEventListener("keyup", e=>{ keys[e.key.toLowerCase()] = false; });
+
+function canMove(nx,ny){
+  const c1 = Math.floor(nx/TILE), c2 = Math.floor((nx+player.w-1)/TILE);
+  const r1 = Math.floor((ny+player.h-6)/TILE), r2 = Math.floor((ny+player.h-1)/TILE); // feet box
+  return !(blocked(c1,r1)||blocked(c2,r1)||blocked(c1,r2)||blocked(c2,r2));
+}
+
+let dialog = null;
+function nearestSpot(){
+  const cx = player.x+player.w/2, cy = player.y+player.h/2;
+  let best=null, bd=1e9;
+  SPOTS.forEach(s=>{
+    const sx=(s.foot.x+s.foot.w/2)*TILE, sy=(s.foot.y+s.foot.h/2)*TILE;
+    const d=Math.hypot(cx-sx, cy-sy); if(d<bd){bd=d;best=s;}
+  });
+  return (best && bd < 34) ? best : null;
+}
+function tryInteract(){
+  if(dialog){ dialog=null; return; }
+  const s = nearestSpot(); if(s) dialog=s;
+}
+
+// ---------- sprites / props ----------
+function drawFloor(){
+  for(let r=2;r<ROWS-1;r++) for(let c=1;c<COLS-1;c++){
+    const a=((r+c)&1); px(c*TILE,r*TILE,TILE,TILE,a?P.floorA:P.floorB);
+    px(c*TILE,r*TILE+TILE-1,TILE,1,P.floorLine);
+  }
+  // rug under center
+  px(7*TILE,6*TILE,5*TILE,3*TILE,P.rug2);
+  px(7*TILE+2,6*TILE+2,5*TILE-4,3*TILE-4,P.rug1);
+  px(7*TILE+5,6*TILE+5,5*TILE-10,3*TILE-10,P.rug2);
+}
+function drawWalls(){
+  for(let c=0;c<COLS;c++){ px(c*TILE,0,TILE,TILE*2,P.wall); px(c*TILE,TILE,TILE,2,P.wallHi); px(c*TILE,TILE*2-3,TILE,3,P.skirt); }
+  for(let r=0;r<ROWS;r++){ px(0,r*TILE,TILE,TILE,P.wallTrim); px((COLS-1)*TILE,r*TILE,TILE,TILE,P.wallTrim); }
+  px(0,(ROWS-1)*TILE,W,TILE,P.wallTrim);
+}
+function drawDesk(x,y){ // 3x2
+  px(x+1,y+TILE+2,3*TILE-2,TILE-4,P.wood); px(x+1,y+TILE+2,3*TILE-2,3,P.woodDk);
+  px(x+2,y+2*TILE-2,3,TILE-4,P.woodDk); px(x+3*TILE-5,y+2*TILE-2,3,TILE-4,P.woodDk);
+  // monitor
+  px(x+TILE-2,y+4,TILE+4,TILE-2,P.metalDk); px(x+TILE,y+6,TILE,TILE-6,P.screen);
+  px(x+TILE+2,y+8,TILE-5,3,P.glow); px(x+TILE+5,y+TILE,6,4,P.metal);
+  // keyboard + mug
+  px(x+TILE,y+TILE+4,TILE,4,P.metal); px(x+3,y+TILE+2,5,6,P.screen2);
+}
+function drawShelf(x,y){ // 3x2 bookshelf
+  px(x+1,y+2,3*TILE-2,2*TILE-4,P.woodDk);
+  px(x+3,y+4,3*TILE-6,TILE-6,P.wood); px(x+3,y+TILE,3*TILE-6,TILE-6,P.wood);
+  const cols=[P.book1,P.book2,P.book3,P.book4,P.book5];
+  for(let i=0;i<8;i++){ px(x+4+i*5,y+5,4,TILE-8,cols[i%5]); px(x+4+i*5,y+TILE+1,4,TILE-8,cols[(i+2)%5]); }
+}
+function drawPhoto(x,y){ // 2x1 framed photo on wall
+  px(x+3,y+2,2*TILE-6,TILE+4,P.frame); px(x+5,y+4,2*TILE-10,TILE,P.photo);
+  px(x+TILE-2,y+7,5,5,P.skin); px(x+TILE-3,y+TILE,7,4,P.shirt); // tiny portrait
+}
+function drawCouch(x,y){ // 3x2
+  px(x+1,y+TILE-2,3*TILE-2,TILE,P.shirtDk); px(x+1,y+6,3*TILE-2,TILE-2,P.shirt);
+  px(x+1,y+6,5,2*TILE-8,P.shirtDk); px(x+3*TILE-6,y+6,5,2*TILE-8,P.shirtDk);
+  px(x+8,y+TILE,5,5,P.rug1); px(x+2*TILE,y+TILE,5,5,P.rug2);
+}
+function drawDoor(x,y){ // 2x1 door + mat
+  px(x+3,y-TILE+4,2*TILE-6,TILE+TILE-6,P.woodDk); px(x+5,y-TILE+6,2*TILE-10,TILE+TILE-10,P.wood);
+  px(x+2*TILE-9,y+2,3,3,P.metal);
+  px(x+2,y+TILE,2*TILE-4,5,P.rug1); // welcome mat
+}
+function drawPlayer(){
+  const x=player.x|0, y=player.y|0; const b = player.moving? (Math.floor(player.step)%2):0;
+  px(x+1,y+player.h-1,player.w-2,2,P.shadow);
+  // legs
+  px(x+2,y+player.h-4+ (b?0:1),3,4,P.pants); px(x+player.w-5,y+player.h-4+(b?1:0),3,4,P.pants);
+  px(x+2,y+player.h-1,3,1,P.shoe); px(x+player.w-5,y+player.h-1,3,1,P.shoe);
+  // body
+  px(x+1,y+5,player.w-2,player.h-8,P.shirt); px(x+1,y+5,player.w-2,2,P.shirtDk);
+  // head
+  px(x+2,y,player.w-4,6,P.skin); px(x+2,y,player.w-4,2,P.hair); px(x+1,y+1,1,3,P.hair); px(x+player.w-2,y+1,1,3,P.hair);
+  // face dir
+  if(player.dir!=="up"){ px(x+3,y+3,1,1,P.ink); px(x+player.w-4,y+3,1,1,P.ink); }
+}
+
+// interaction prompt bubble
+function drawPrompt(){
+  if(dialog) return;
+  const s = nearestSpot();
+  if(s){
+    const bx=player.x+player.w/2-4, by=player.y-9;
+    px(bx-1,by-1,10,9,P.ink); px(bx,by,8,7,s.color); ctx.fillStyle=P.ink; ctx.font="7px monospace"; ctx.fillText("E",bx+2.5,by+5.5);
+  }
+}
+
+// ---------- UI dialog (drawn crisp on top, at screen scale) ----------
+function drawDialog(){
+  if(!dialog) return;
+  // dim
+  ctx.fillStyle="rgba(10,8,18,.35)"; ctx.fillRect(0,0,W,H);
+  const bx=10, bw=W-20, bh=64, by=H-bh-8;
+  px(bx,by,bw,bh,P.ink); px(bx,by,bw,2,dialog.color); px(bx,by+bh-2,bw,2,dialog.color);
+  px(bx,by,2,bh,dialog.color); px(bx+bw-2,by,2,bh,dialog.color);
+  ctx.fillStyle=dialog.color; ctx.font="bold 7px monospace"; ctx.fillText(dialog.title, bx+6, by+11);
+  ctx.fillStyle=P.white; ctx.font="7px monospace";
+  dialog.body.forEach((l,i)=> ctx.fillText(l, bx+6, by+22+i*8));
+  ctx.fillStyle="#565a76"; ctx.font="6px monospace"; ctx.fillText("▸ E / ESC to close", bx+bw-72, by+bh-5);
+}
+
+// ---------- loop ----------
+function update(){
+  player.moving=false;
+  if(!dialog){
+    let dx=0,dy=0;
+    if(keys["arrowleft"]||keys["a"]){dx=-1;player.dir="left";}
+    else if(keys["arrowright"]||keys["d"]){dx=1;player.dir="right";}
+    if(keys["arrowup"]||keys["w"]){dy=-1;player.dir="up";}
+    else if(keys["arrowdown"]||keys["s"]){dy=1;player.dir="down";}
+    if(dx||dy){
+      const nx=player.x+dx*player.spd, ny=player.y+dy*player.spd;
+      if(canMove(nx,player.y)) player.x=nx;
+      if(canMove(player.x,ny)) player.y=ny;
+      player.moving=true; player.step+=0.18;
+    }
+  }
+}
+function render(){
+  ctx.clearRect(0,0,W,H);
+  px(0,0,W,H,P.floorB);
+  drawWalls(); drawFloor();
+  // props (sorted back-to-front already by y order in SPOTS roughly)
+  SPOTS.slice().sort((a,b)=>a.ty-b.ty).forEach(s=> s.draw(s.foot.x*TILE, s.foot.y*TILE));
+  drawPlayer();
+  drawPrompt();
+  drawDialog();
+}
+function frame(){ update(); render(); requestAnimationFrame(frame); }
+frame();
+</script>
+</body>
+</html>
