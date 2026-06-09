@@ -9,7 +9,7 @@ A refined, minimalist creative portfolio website featuring a WebGL particle hero
 ## 🚀 Features
 
 * **WebGL Particle Hero** — A morphing, interactive particle sphere (Three.js) that responds to cursor drift and fades out smoothly on scroll.
-* **Binary Particle Field** — Floating floating `0` and `1` glyphs in the brand palette, reacting to mouse parallax coordinates.
+* **Binary Particle Field** — Floating `0` and `1` glyphs in the brand palette, reacting to mouse parallax coordinates.
 * **Intro Loader** — A progressive loading sequence with a `0 → 100` counter, reveal transitions, and text wipes.
 * **Dynamic Header & Footer** — A sticky glassmorphic navigation bar that becomes compact and blurred on scroll, matching a solid blurred footer.
 * **Interactive Connect Form** — A fully-functioning AJAX message form integrated with **Web3Forms** for client-side messaging with custom success/error visual states.
