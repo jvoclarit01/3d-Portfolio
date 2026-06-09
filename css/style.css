@@ -1308,7 +1308,7 @@ h1, h2, h3, h4, .hero2__title, .feature__heading, .projects-main-title, .connect
    long unbreakable token (the address) that forces the document wide and
    stretches the fixed header. Let it wrap. */
 .contact-email-btn { max-width: 100%; }
-.contact-email-btn .btn__text { white-space: normal; overflow-wrap: anywhere; }
+.contact-email-btn .btn__text { white-space: normal; overflow-wrap: anywhere; font-size: clamp(0.75rem, 3.5vw, 1.1rem);}
 
 /* Defensive root clip is scoped to <=1024px ONLY. At this width the projects
    scroll-pinned animation is already disabled, so clipping the root can't
