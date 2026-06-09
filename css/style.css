@@ -284,7 +284,7 @@ a:hover .cw__inner, a:focus-visible .cw__inner { transform: translateY(-100%); }
 .statement__heading { font-size: clamp(1.8rem, 4.4vw, 4rem); font-weight: 500; letter-spacing: -.025em; line-height: 1.12; max-width: 18ch; margin-inline: auto; }
 
 /* ---------- FEATURE TYPOGRAPHY (used inside stages) ---------- */
-.feature__heading { font-size: clamp(2.2rem, 4.6vw, 3rem); font-weight: 600; letter-spacing: -.03em; line-height: 1.05; }
+.feature__heading { font-size: clamp(1.8rem, 3.8vw, 2.4rem); font-weight: 600; letter-spacing: -.03em; line-height: 1.05; }
 .feature__heading .d-block { display: block; overflow: hidden; }
 .feature__body { font-size: clamp(1.05rem, 1.5vw, 1.35rem); color: #d6d6da; display: flex; flex-direction: column; gap: 22px; }
 .feature__body em { color: var(--text); }
@@ -642,7 +642,7 @@ a:hover .cw__inner, a:focus-visible .cw__inner { transform: translateY(-100%); }
   color: var(--muted);
 }
 .projects-main-title {
-  font-size: clamp(2.2rem, 5vw, 4.5rem);
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.1;
@@ -679,7 +679,7 @@ a:hover .cw__inner, a:focus-visible .cw__inner { transform: translateY(-100%); }
   letter-spacing: 0.05em;
 }
 .project-name {
-  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-size: clamp(1.5rem, 2.5vw, 2.2rem);
   font-weight: 600;
   letter-spacing: -0.02em;
 }
@@ -849,7 +849,7 @@ a:hover .cw__inner, a:focus-visible .cw__inner { transform: translateY(-100%); }
 }
 .contact-section__heading,
 .connect-section__heading {
-  font-size: clamp(1.6rem, 8vw, 4.5rem);
+  font-size: clamp(1.4rem, 6.5vw, 3.2rem);
   font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1.05;
@@ -897,7 +897,7 @@ a:hover .cw__inner, a:focus-visible .cw__inner { transform: translateY(-100%); }
   gap: 16px;
 }
 .contact-details__title {
-  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.2;
@@ -1121,6 +1121,16 @@ a:hover .cw__inner, a:focus-visible .cw__inner { transform: translateY(-100%); }
   opacity: 0.15;
 }
 
+.paper-noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg width='250' height='250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='3' result='coarse' stitchTiles='stitch'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' result='fine' stitchTiles='stitch'/%3E%3CfeBlend mode='multiply' in='coarse' in2='fine' result='blended'/%3E%3CfeColorMatrix type='saturate' values='0' result='mono'/%3E%3CfeDiffuseLighting in='mono' lighting-color='%23ffffff' surfaceScale='1.5' result='light'%3E%3CfeDistantLight azimuth='45' elevation='60'/%3E%3C/feDiffuseLighting%3E%3CfeBlend mode='multiply' in='SourceGraphic' in2='light'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%23ffffff' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+}
+
 body {
   font-family: var(--font-sans) !important;
   background: var(--bg);
@@ -1267,5 +1277,80 @@ h1, h2, h3, h4, .hero2__title, .feature__heading, .projects-main-title, .connect
 /* Caution highlights */
 .highlight {
   background-image: linear-gradient(100deg, var(--accent-soft), var(--accent-2), var(--accent)) !important;
+}
+
+/* ============================================================
+   MOBILE RESPONSIVENESS FIXES
+   Placed last so the mobile !important rules win source-order
+   ties against the HUD overrides above.
+   ============================================================ */
+
+/* --- kill horizontal overflow at every width ---
+   Grid/flex children default to min-width:auto, which lets long
+   headings and unbreakable words expand their track past the
+   viewport and clip the page. Reset them and let text wrap. */
+.stage__inner, .projects-inner, .connect-section__grid,
+.contact-section__grid, .activity__grid,
+.stage__col, .stage__content, .projects-content-side, .connect-col,
+.presence, .contrib, .nowplaying,
+.contact-details-card, .contact-form-card { min-width: 0; }
+
+.hero2__title, .feature__heading, .projects-main-title,
+.connect-section__heading, .contact-section__heading,
+.contact-details__title, .presence__name, .nowplaying__song {
+  overflow-wrap: break-word;
+}
+
+/* the hero title lines should stack (the class literally means display:block) */
+.hero2__title .d-block { display: block; }
+
+/* root cause of mobile horizontal scroll: the contact email button holds one
+   long unbreakable token (the address) that forces the document wide and
+   stretches the fixed header. Let it wrap. */
+.contact-email-btn { max-width: 100%; }
+.contact-email-btn .btn__text { white-space: normal; overflow-wrap: anywhere; }
+
+/* Defensive root clip is scoped to <=1024px ONLY. At this width the projects
+   scroll-pinned animation is already disabled, so clipping the root can't
+   break position:sticky (it does on desktop — keep desktop clip-free). */
+@media (max-width: 1024px) {
+  html { overflow-x: clip; }
+}
+
+@media (max-width: 767px) {
+  /* headings keep their ORIGINAL font sizes; only the wide HUD letter-spacing
+     is dropped so the original-size caps still wrap within the viewport */
+  .hero2__title, .feature__heading, .projects-main-title,
+  .connect-section__heading, .contact-section__heading,
+  .contact-details__title { letter-spacing: 0 !important; }
+
+  /* hero: the redundant scroll cue collides with the CTA row on a short hero */
+  .hero__scroll { display: none; }
+  .hero2__blurb { max-width: 100%; }
+  .hero2__actions { gap: 16px; }
+
+  /* header: keep brand + Contact button on one line inside the viewport */
+  .header__inner { gap: 12px; }
+  .nav .btn--primary { padding: 10px 16px; letter-spacing: .05em; }
+
+  /* touch targets >= 44x44 (social icons were 40px) */
+  .icon-btn { width: 44px; height: 44px; }
+  .icon-btn svg { width: 20px; height: 20px; }
+
+  /* email CTA: full-width, the address wraps instead of forcing a scrollbar
+     (original font size kept) */
+  .contact-email-btn { width: 100%; padding: 14px 16px; letter-spacing: .02em; }
+  .contact-email-btn .btn__text { word-break: break-all; }
+
+  /* keep the Discord username on one line (ellipsis) instead of breaking mid-word */
+  .presence__name { letter-spacing: 0 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+@media (max-width: 420px) {
+  /* GitHub stat tiles: 3 tight columns -> 2 comfortable ones */
+  .signals__stats { grid-template-columns: repeat(2, 1fr); }
+  /* ease edge-to-edge cramping on the cards */
+  .presence, .contrib, .nowplaying,
+  .contact-details-card, .contact-form-card { padding: 20px; }
 }
 
