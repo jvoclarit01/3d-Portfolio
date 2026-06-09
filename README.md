@@ -1,6 +1,6 @@
 # Jan Vincent Oclarit — Creative Engineer & 3D Web Developer
 
-An animated, dark-theme creative portfolio website featuring a WebGL particle hero, dynamic grid systems, and a drifting field of binary parallax particles. Built with a focus on tactile digital experiences, high-fidelity typography, and expressive motion.
+A refined, minimalist creative portfolio website featuring a WebGL particle hero, dynamic grids, and clean layout design. Built with a focus on polished typography, seamless interactions, and high-performance frontend engineering.
 
 👉 **Live Site:** [jvoclarit.pages.dev](https://jvoclarit.pages.dev/)
 
