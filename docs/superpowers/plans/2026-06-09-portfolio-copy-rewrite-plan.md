@@ -93,13 +93,12 @@
                   <p>I focus on GPU-accelerated graphics, fine-tuned typography, and rich physical motion. My work is built on robust engineering and strict design principles.</p>
                 </div>
   ```
-  with:
   ```html
                 <div class="stage__p">
-                  <p>I focus on building fluid, responsive interfaces that bring digital ideas to life. By combining modern design systems with robust engineering, I create websites that are both visually refined and highly functional.</p>
+                  <p>I build fluid, responsive interfaces that bring digital ideas to life. By combining modern design systems with robust engineering, I create websites that are visually refined and highly functional.</p>
                 </div>
                 <div class="stage__p">
-                  <p>My approach centers on performance, clean typography, and subtle, meaningful interactions. I believe that great digital products are built on a foundation of attention to detail and structured code.</p>
+                  <p>My approach centers on performance, clean typography, and subtle, meaningful interactions.</p>
                 </div>
   ```
 

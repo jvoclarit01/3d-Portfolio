@@ -29,8 +29,8 @@ Following a collaborative brainstorming session, the **High-End Minimalist / Edi
   <span class="d-block">at the intersection of design and code</span>
   ```
   (previously: "Building with craft and code")
-* **Paragraph 1:** "I focus on building fluid, responsive interfaces that bring digital ideas to life. By combining modern design systems with robust engineering, I create websites that are both visually refined and highly functional." (previously: "I am a creative developer who bridges the gap between design systems and immersive frontend technology. I make digital interfaces feel responsive, tactile, and human.")
-* **Paragraph 2:** "My approach centers on performance, clean typography, and subtle, meaningful interactions. I believe that great digital products are built on a foundation of attention to detail and structured code." (previously: "I focus on GPU-accelerated graphics, fine-tuned typography, and rich physical motion. My work is built on robust engineering and strict design principles.")
+* **Paragraph 1:** "I build fluid, responsive interfaces that bring digital ideas to life. By combining modern design systems with robust engineering, I create websites that are visually refined and highly functional." (previously: "I am a creative developer who bridges the gap between design systems and immersive frontend technology. I make digital interfaces feel responsive, tactile, and human.")
+* **Paragraph 2:** "My approach centers on performance, clean typography, and subtle, meaningful interactions." (previously: "I focus on GPU-accelerated graphics, fine-tuned typography, and rich physical motion. My work is built on robust engineering and strict design principles.")
 
 ### 2.3 Projects Showcase Section
 * **Project 1: Interactive 3D Portfolio**
